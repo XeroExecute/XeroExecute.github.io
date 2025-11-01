@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+    <title>
+TryHackMe: Industrial Intrusion - auth (9005) | XeroExecute Blog
+</title>
+
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<link rel="stylesheet" href="/css/syntax.css">
+
+<meta name="generator" content="Hugo 0.148.2">
+
+
+<link rel="canonical" href="https://XeroExecute.github.io/posts/industrialctf/" >
+
+
+
+
+<link href="/css/style.min.90736ee77f53c2c00d3420ec289628098ca29b2bb76d548c974fc6d5d973ec50.css" rel="stylesheet">
+
+
+
+
+</head>
+
+<body>
+
+    <div class="flexWrapper">
+        <header class="headerWrapper">
+    <div class="header">
+        <div class="headerLogoContainer">
+            <a href="https://XeroExecute.github.io/" class="headerLogo">
+                <img src="/logo.png" alt="XeroExecute" class="logoImg">
+            </a>
+            <a class="terminal" href="https://XeroExecute.github.io/">
+                <span>blog@XeroExecute.github.io ~ $</span>
+            </a>
+        </div>
+        <input class="side-menu" type="checkbox" id="side-menu">
+        <label class="hamb" for="side-menu"><span class="hamb-line"></span></label>
+        <nav class="headerLinks">
+            <ul>
+                
+                <li>
+                    <a href="https://XeroExecute.github.io/posts" title="" >
+                        ~/posts</a>
+                </li>
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+        <div class="content">
+            <main class="main">
+                
+<div class="postWrapper">
+    <h1>TryHackMe: Industrial Intrusion - auth (9005)</h1>
+    
+    
+    <section class="postMetadata">
+        <dl>
+            
+                
+<dt>tags</dt>
+<dd><span></span>
+    <a href="/tags/re/">#Re</a></dd>
+            
+            
+            
+            
+                <dt>published</dt>
+                
+                <dd><time datetime="2025-06-27">June 27, 2025</time></dd>
+            
+            
+                <dt>reading time</dt>
+                <dd>2 minutes</dd>
+            
+        </dl>
+    </section>
+    
+    
+    <aside class="toc-container">
+        <h2>Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#description">Description</a></li>
+    <li><a href="#solution">Solution</a>
+      <ul>
+        <li><a href="#static-analysis">Static Analysis</a></li>
+        <li><a href="#reversing-the-xor">Reversing the XOR</a></li>
+        <li><a href="#remote-interaction">Remote Interaction</a></li>
+        <li><a href="#result">Result</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    </aside>
+    
+    <div>
+        <p>Earlier today, I played the TryHackMe <a href="https://tryhackme.com/room/industrial-intrusion">Industrial Intrusion</a> CTF with the <strong>ByteStorm</strong> team. One of the easy reverse engineering challenges I tackled, titled &ldquo;<em>auth</em>&rdquo;, had us unpacking a stripped-down authentication module running on a simulated industrial gateway.</p>
+<h2 id="description">Description</h2>
+<blockquote>
+<p>ZeroTrace intercepts a stripped-down authentication module running on a remote industrial gateway. Assembly scrolls across glowing monitors as she unpacks the logic behind the plant’s digital checkpoint.</p></blockquote>
+<h2 id="solution">Solution</h2>
+<h3 id="static-analysis">Static Analysis</h3>
+<p>Using Ghidra, I analyzed the stripped binary and found that it accepts 8 bytes of input, applies a XOR transformation, and checks it against a specific hardcoded value.</p>
+<p>Here’s the key logic from <code>main</code>:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">undefined8</span> <span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="p">...</span>
+</span></span><span class="line"><span class="cl">    <span class="n">local_160</span> <span class="o">=</span> <span class="mh">0xefcdab8967452301</span><span class="p">;</span>  <span class="c1">// Target value in little-endian
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">fgets</span><span class="p">((</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span><span class="n">local_158</span><span class="p">,</span> <span class="mh">0x40</span><span class="p">,</span> <span class="n">stdin</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">sVar4</span> <span class="o">=</span> <span class="nf">strnlen</span><span class="p">((</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span><span class="n">local_158</span><span class="p">,</span> <span class="mh">0x40</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">sVar4</span> <span class="o">==</span> <span class="mi">8</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">local_168</span> <span class="o">=</span> <span class="n">local_158</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">transform</span><span class="p">(</span><span class="o">&amp;</span><span class="n">local_168</span><span class="p">,</span> <span class="mi">8</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="nf">memcmp</span><span class="p">(</span><span class="o">&amp;</span><span class="n">local_168</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">local_160</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">FILE</span><span class="o">*</span> <span class="n">f</span> <span class="o">=</span> <span class="nf">fopen</span><span class="p">(</span><span class="s">&#34;flag.txt&#34;</span><span class="p">,</span> <span class="s">&#34;r&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="nf">fgets</span><span class="p">(</span><span class="n">local_118</span><span class="p">,</span> <span class="mh">0x100</span><span class="p">,</span> <span class="n">f</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;[+] Access Granted! Flag: %s&#34;</span><span class="p">,</span> <span class="n">local_118</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;[!] Access Denied!&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">puts</span><span class="p">(</span><span class="s">&#34;[!] Access Denied!&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">...</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>The <code>transform()</code> function used in this comparison is a simple XOR loop:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">transform</span><span class="p">(</span><span class="kt">long</span> <span class="n">param_1</span><span class="p">,</span> <span class="n">ulong</span> <span class="n">param_2</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">param_2</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="o">*</span><span class="p">(</span><span class="n">byte</span> <span class="o">*</span><span class="p">)(</span><span class="n">param_1</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span> <span class="o">^=</span> <span class="mh">0x55</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h3 id="reversing-the-xor">Reversing the XOR</h3>
+<p>To pass the check, the XOR can simply be reversed.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># XOR the target bytes with 0x55</span>
+</span></span><span class="line"><span class="cl"><span class="n">target</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">([</span><span class="mh">0x01</span><span class="p">,</span> <span class="mh">0x23</span><span class="p">,</span> <span class="mh">0x45</span><span class="p">,</span> <span class="mh">0x67</span><span class="p">,</span> <span class="mh">0x89</span><span class="p">,</span> <span class="mh">0xab</span><span class="p">,</span> <span class="mh">0xcd</span><span class="p">,</span> <span class="mh">0xef</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">b</span> <span class="o">^</span> <span class="mh">0x55</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">target</span><span class="p">])</span>
+</span></span></code></pre></div><h3 id="remote-interaction">Remote Interaction</h3>
+<p>The service was hosted at <code>10.10.195.10:9005</code>. Since the input includes raw bytes, we used a Python script:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">socket</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">host</span> <span class="o">=</span> <span class="s1">&#39;10.10.195.10&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">port</span> <span class="o">=</span> <span class="mi">9005</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">target</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">([</span><span class="mh">0x01</span><span class="p">,</span> <span class="mh">0x23</span><span class="p">,</span> <span class="mh">0x45</span><span class="p">,</span> <span class="mh">0x67</span><span class="p">,</span> <span class="mh">0x89</span><span class="p">,</span> <span class="mh">0xab</span><span class="p">,</span> <span class="mh">0xcd</span><span class="p">,</span> <span class="mh">0xef</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl"><span class="n">payload</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">b</span> <span class="o">^</span> <span class="mh">0x55</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">target</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">with</span> <span class="n">socket</span><span class="o">.</span><span class="n">create_connection</span><span class="p">((</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">))</span> <span class="k">as</span> <span class="n">sock</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">sock</span><span class="o">.</span><span class="n">sendall</span><span class="p">(</span><span class="n">payload</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">response</span> <span class="o">=</span> <span class="n">sock</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">4096</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;[Server Response] &#34;</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">))</span>
+</span></span></code></pre></div><h3 id="result">Result</h3>
+<p>Executing the script triggered <code>[+] Access Granted!</code> and printed the flag from the remote system.</p>
+
+    </div>
+</div>
+
+            </main>
+        </div>
+
+
+        <footer class="footer">
+    
+        <span>
+            © 2025 XeroExecute Blog, Built with
+            <a href="https://gohugo.io" class="footerLink">Hugo</a> and
+            <a href="https://github.com/LordMathis/hugo-theme-nightfall" class="footerLink">Nightfall</a> theme
+        </span>
+    
+</footer>
+    </div>
+
+</body>
+
+</html>

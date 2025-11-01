@@ -8,8 +8,15 @@
     <language>en-us</language>
     <managingEditor>sir_xxxx@protonmail.com (XeroExecute Blog)</managingEditor>
     <webMaster>sir_xxxx@protonmail.com (XeroExecute Blog)</webMaster>
-    <lastBuildDate>Mon, 31 Mar 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 27 Jun 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://XeroExecute.github.io/tags/re/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>TryHackMe: Industrial Intrusion - auth (9005)</title>
+      <link>https://XeroExecute.github.io/posts/industrialctf/</link>
+      <pubDate>Fri, 27 Jun 2025 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
+      <guid>https://XeroExecute.github.io/posts/industrialctf/</guid>
+      <description>A reverse engineering challenge involving XOR decoding and memory comparison to retrieve the flag from a remote industrial gateway.</description>
+    </item>
     <item>
       <title>SwampCTF: You Shall Not Passss</title>
       <link>https://XeroExecute.github.io/posts/you_shall_not_passss/</link>
@@ -25,7 +32,7 @@
       <description>Try Hack Me Hackfinity Battle CTF Writeups</description>
     </item>
     <item>
-      <title>Huntress2024</title>
+      <title>Huntress 2024</title>
       <link>https://XeroExecute.github.io/posts/huntress2024/</link>
       <pubDate>Thu, 31 Oct 2024 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
       <guid>https://XeroExecute.github.io/posts/huntress2024/</guid>

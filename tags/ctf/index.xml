@@ -8,8 +8,15 @@
     <language>en-us</language>
     <managingEditor>sir_xxxx@protonmail.com (XeroExecute Blog)</managingEditor>
     <webMaster>sir_xxxx@protonmail.com (XeroExecute Blog)</webMaster>
-    <lastBuildDate>Mon, 06 Jan 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 01 Nov 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://XeroExecute.github.io/tags/ctf/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>No Limits Huntress 2025</title>
+      <link>https://XeroExecute.github.io/posts/nolimits/</link>
+      <pubDate>Sat, 01 Nov 2025 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
+      <guid>https://XeroExecute.github.io/posts/nolimits/</guid>
+      <description>Exploiting a parent-child process architecture to bypass seccomp restrictions using /proc/pid/mem and GOT hijacking to read the flag.</description>
+    </item>
     <item>
       <title>Sqlate IrisCTF 2025 (pwn)</title>
       <link>https://XeroExecute.github.io/posts/sqlate/</link>
@@ -18,7 +25,7 @@
       <description>Exploit writeup for the Sqlate challenge from IrisCTF 2025 by lambda, involving a buffer overflow in a custom encoding mechanism to escalate privileges and retrieve the flag.</description>
     </item>
     <item>
-      <title>Huntress2024</title>
+      <title>Huntress 2024</title>
       <link>https://XeroExecute.github.io/posts/huntress2024/</link>
       <pubDate>Thu, 31 Oct 2024 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
       <guid>https://XeroExecute.github.io/posts/huntress2024/</guid>
