@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+    <title>
+Rust Tickler 3 | XeroExecute Blog
+</title>
+
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<link rel="stylesheet" href="/css/syntax.css">
+
+<meta name="generator" content="Hugo 0.148.2">
+
+
+<link rel="canonical" href="https://XeroExecute.github.io/posts/rt3/" >
+
+
+
+
+<link href="/css/style.min.0a8bc3dafec135b0e6d7ef7cf60a4d3d04951624dd8ea930e6b7ec4a14d60bcc.css" rel="stylesheet">
+
+
+
+
+</head>
+
+<body>
+
+    <div class="flexWrapper">
+        <header class="headerWrapper">
+    <div class="header">
+        <div class="headerLogoContainer">
+            <a href="https://XeroExecute.github.io/" class="headerLogo">
+                <img src="/logo.png" alt="XeroExecute" class="logoImg">
+            </a>
+            <a class="terminal" href="https://XeroExecute.github.io/">
+                <span>blog@XeroExecute.github.io ~ $</span>
+            </a>
+        </div>
+        <input class="side-menu" type="checkbox" id="side-menu">
+        <label class="hamb" for="side-menu"><span class="hamb-line"></span></label>
+        <nav class="headerLinks">
+            <ul>
+                
+                <li>
+                    <a href="https://XeroExecute.github.io/posts" title="" >
+                        ~/posts</a>
+                </li>
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+        <div class="content">
+            <main class="main">
+                
+<div class="postWrapper">
+    <h1>Rust Tickler 3</h1>
+    
+    
+    <section class="postMetadata">
+        <dl>
+            
+                
+<dt>tags</dt>
+<dd><span></span>
+    <a href="/tags/re/">#Re</a><span></span>
+    <a href="/tags/ctf/">#Ctf</a><span></span>
+    <a href="/tags/rust/">#Rust</a></dd>
+            
+            
+            
+            
+                <dt>published</dt>
+                
+                <dd><time datetime="2025-11-03">November 3, 2025</time></dd>
+            
+            
+                <dt>reading time</dt>
+                <dd>14 minutes</dd>
+            
+        </dl>
+    </section>
+    
+    
+    <aside class="toc-container">
+        <h2>Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#description">Description</a></li>
+    <li><a href="#solution">Solution</a>
+      <ul>
+        <li><a href="#stage-1-rust-tickler-3exe">Stage 1: rust-tickler-3.exe</a></li>
+        <li><a href="#stage-2-rust-tickler-3-stage-2exe">Stage 2: rust-tickler-3-stage-2.exe</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    </aside>
+    
+    <div>
+        <h2 id="description">Description</h2>
+<p><strong>Challenge Author</strong>: @Nordgaren<br>
+<strong>Challenge Prompt</strong>: It&rsquo;s back. Good luck.<br>
+<strong>Category</strong>: Reverse Engineering<br>
+<strong>CTF</strong>: Huntress 2025</p>
+<h2 id="solution">Solution</h2>
+<h3 id="stage-1-rust-tickler-3exe">Stage 1: rust-tickler-3.exe</h3>
+<h4 id="initial-analysis">Initial Analysis</h4>
+<p>The challenge provides a Rust binary for analysis. Opening the binary in IDA Free and decompiling it reveals the typical Rust structure with a main function. Upon dynamic execution of the binary, the user is presented with the following prompt:</p>
+<blockquote>
+<p>What is my favorite sha256 hash?</p></blockquote>
+<p>Since this binary expects user input that needs to be validated for some activity, the analysis focuses on identifying where user input gets validated by examining the overall code structure and setting strategic breakpoints on potentially relevant code patterns.</p>
+<h4 id="validation-function">Validation Function</h4>
+<p>To find the validation routine, breakpoints are placed on interesting code patterns in the disassembled view of IDA Free, particularly on <code>if</code> statements and function calls that could be involved in validation logic. Executing the binary in IDA&rsquo;s built-in debugger and stepping through the code flow reveals the following sequence:</p>
+<ol>
+<li>The first several <code>if</code> statements are reached before user input is even collected, ruling them out as the validation check</li>
+<li>After providing test input and continuing execution, a breakpoint is hit at a significant <code>if</code> statement</li>
+</ol>
+<p>This critical <code>if</code> statement contains the validation logic (note that functions have been renamed for better readability):</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span> <span class="nf">xor_prng_validate_input</span><span class="p">(</span><span class="n">args1</span><span class="p">,</span> <span class="p">(</span><span class="kr">__int64</span><span class="p">)</span><span class="n">args2</span><span class="p">,</span> <span class="n">args3</span><span class="p">)</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">may_msg_print</span><span class="p">(</span><span class="o">&amp;</span><span class="n">v62</span><span class="p">,</span> <span class="p">(</span><span class="kr">__int64</span><span class="p">)</span><span class="o">&amp;</span><span class="n">args1_prt</span><span class="p">,</span> <span class="mi">4921</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span> <span class="p">(</span><span class="n">_QWORD</span><span class="p">)</span><span class="n">v62</span> <span class="o">==</span> <span class="mh">0x8000000000000000uLL</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="k">goto</span> <span class="n">LABEL_113</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hObject</span><span class="p">.</span><span class="n">m256i_i64</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="kr">__int64</span><span class="p">)</span><span class="n">p_p_hObject</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">*</span><span class="p">(</span><span class="n">_OWORD</span> <span class="o">*</span><span class="p">)</span><span class="n">hObject</span><span class="p">.</span><span class="n">m256i_i8</span> <span class="o">=</span> <span class="n">v62</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">p_hObject</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">hObject</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">v57</span> <span class="o">=</span> <span class="p">(</span><span class="kr">__int64</span><span class="p">)</span><span class="n">sub_11D0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">*</span><span class="p">(</span><span class="n">_QWORD</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">v62</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">unk_240A478</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">*</span><span class="p">((</span><span class="n">_QWORD</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">v62</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">v65</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span></code></pre></div><p>The validation occurs through a call to <code>xor_prng_validate_input</code> at <code>BASE+23EDDF0</code>. The function receives three arguments in the following registers:</p>
+<ul>
+<li>First argument (RSI / args1): Pointer to a structure containing encrypted data</li>
+<li>Second argument (R13 / args2): Pointer to the user&rsquo;s input</li>
+<li>Third argument (RDX / args3): Length of the input</li>
+</ul>
+<p>The <code>xor_prng_validate_input</code> function implements a custom stream cipher using a PRNG-like algorithm:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">bool</span> <span class="kr">__fastcall</span> <span class="nf">xor_prng_validate_input</span><span class="p">(</span><span class="kr">__int64</span> <span class="n">a1</span><span class="p">,</span> <span class="kr">__int64</span> <span class="n">a2</span><span class="p">,</span> <span class="kr">__int64</span> <span class="n">a3</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">v3</span><span class="p">;</span> <span class="c1">// seed (from struct)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kr">__int64</span> <span class="n">v4</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span> <span class="o">*</span><span class="p">(</span><span class="n">_QWORD</span> <span class="o">*</span><span class="p">)(</span><span class="n">a1</span> <span class="o">+</span> <span class="mi">16</span><span class="p">)</span> <span class="o">!=</span> <span class="n">a3</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">v3</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="n">_DWORD</span> <span class="o">*</span><span class="p">)(</span><span class="n">a1</span> <span class="o">+</span> <span class="mi">24</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">do</span>
+</span></span><span class="line"><span class="cl">  <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">a3</span> <span class="o">==</span> <span class="n">v4</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">uint32_t</span> <span class="n">v6</span> <span class="o">=</span> <span class="n">v3</span> <span class="o">*</span> <span class="p">((</span><span class="nf">__ROR4__</span><span class="p">(</span><span class="n">v3</span><span class="p">,</span> <span class="n">v3</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xFFFFFFFC</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="nf">__ROL4__</span><span class="p">(</span><span class="o">~</span><span class="n">v3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="o">|</span> <span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">uint32_t</span> <span class="n">v7</span> <span class="o">=</span> <span class="n">v6</span> <span class="o">&gt;&gt;</span> <span class="p">((</span><span class="n">v3</span> <span class="o">&gt;&gt;</span> <span class="p">(</span><span class="o">~</span><span class="p">(</span><span class="n">_BYTE</span><span class="p">)</span><span class="n">v3</span> <span class="o">&amp;</span> <span class="mh">0xF</span><span class="p">))</span> <span class="o">%</span> <span class="mh">0x18</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">v3</span> <span class="o">=</span> <span class="n">v6</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">((</span><span class="o">*</span><span class="p">(</span><span class="n">_BYTE</span> <span class="o">*</span><span class="p">)(</span><span class="n">a2</span> <span class="o">+</span> <span class="n">v4</span><span class="p">)</span> <span class="o">^</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kr">__int8</span><span class="p">)</span><span class="n">v7</span><span class="p">)</span> <span class="o">!=</span> <span class="o">*</span><span class="p">(</span><span class="n">_BYTE</span> <span class="o">*</span><span class="p">)(</span><span class="o">*</span><span class="p">(</span><span class="n">_QWORD</span> <span class="o">*</span><span class="p">)(</span><span class="n">a1</span> <span class="o">+</span> <span class="mi">8</span><span class="p">)</span> <span class="o">+</span> <span class="n">v4</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">++</span><span class="n">v4</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>The function operates by:</p>
+<ol>
+<li>Verifying the input length matches the expected length stored in the structure at offset <code>+16</code></li>
+<li>Extracting a seed value from the structure at offset <code>+24</code></li>
+<li>Generating a pseudo-random keystream using bitwise operations (ROR, ROL, XOR)</li>
+<li>XORing each input byte with the corresponding keystream byte</li>
+<li>Comparing the result against pre-encrypted data pointed to by offset <code>+8</code> in the structure</li>
+</ol>
+<p>To understand the data structure being used and where it comes from, the decompiled code before the validation call is examined. Tracing where <code>args1</code> originates from reveals it comes from a lookup function just a few lines above the validation:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">v1</span> <span class="o">=</span> <span class="nf">lookup_struct_entry_by_id</span><span class="p">(</span><span class="o">&amp;</span><span class="n">args1_ptr</span><span class="p">,</span> <span class="mi">4922</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="n">v1</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="k">goto</span> <span class="n">LABEL_113</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">args1</span> <span class="o">=</span> <span class="n">v1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">args2</span> <span class="o">=</span> <span class="nf">utf8_skip_ws_and_return_ptr</span><span class="p">(</span><span class="n">v79</span><span class="p">,</span> <span class="n">v80</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">v5</span> <span class="o">=</span> <span class="n">args3</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kr">__int8</span><span class="p">)</span><span class="nf">xor_prng_validate_input</span><span class="p">(</span><span class="n">args1</span><span class="p">,</span> <span class="n">args2</span><span class="p">,</span> <span class="n">args3</span><span class="p">)</span> <span class="p">)</span>
+</span></span></code></pre></div><p>The <code>args1</code> structure is retrieved by <code>lookup_struct_entry_by_id</code>, which takes a pointer to an array of structures (<code>args1_ptr</code>) and an index value (<code>4922</code>) used to identify the specific entry. Analyzing this lookup function reveals how the structure array is organized:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kr">__int64</span> <span class="kr">__fastcall</span> <span class="nf">lookup_struct_entry_by_id</span><span class="p">(</span><span class="kr">__int64</span> <span class="n">struct_array_ptr</span><span class="p">,</span> <span class="kt">int</span> <span class="n">search_id</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">__int64</span> <span class="n">current_entry_ptr</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">__int64</span> <span class="n">remaining_bytes</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">__int64</span> <span class="n">found_entry</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">bool</span> <span class="n">id_matches</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">current_entry_ptr</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="n">_QWORD</span> <span class="o">*</span><span class="p">)(</span><span class="n">struct_array_ptr</span> <span class="o">+</span> <span class="mi">8</span><span class="p">)</span> <span class="o">-</span> <span class="mi">40LL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">remaining_bytes</span> <span class="o">=</span> <span class="mi">40LL</span> <span class="o">*</span> <span class="o">*</span><span class="p">(</span><span class="n">_QWORD</span> <span class="o">*</span><span class="p">)(</span><span class="n">struct_array_ptr</span> <span class="o">+</span> <span class="mi">16</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">while</span> <span class="p">(</span> <span class="n">remaining_bytes</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">found_entry</span> <span class="o">=</span> <span class="n">current_entry_ptr</span> <span class="o">+</span> <span class="mi">40</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">remaining_bytes</span> <span class="o">-=</span> <span class="mi">40</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">id_matches</span> <span class="o">=</span> <span class="o">*</span><span class="p">(</span><span class="n">_DWORD</span> <span class="o">*</span><span class="p">)(</span><span class="n">current_entry_ptr</span> <span class="o">+</span> <span class="mi">72</span><span class="p">)</span> <span class="o">==</span> <span class="n">search_id</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">current_entry_ptr</span> <span class="o">+=</span> <span class="mi">40</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span> <span class="n">id_matches</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="n">found_entry</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>This function searches through an array of 40-byte structures. The <code>struct_array_ptr</code> parameter points to a structure that contains the base address and count of entries in the array. The function iterates through these entries, comparing the ID field at offset <code>+32</code> (shown by <code>current_entry_ptr + 72</code> which equals <code>current_entry_ptr + 40 + 32</code>) until it finds the entry matching the <code>search_id</code> of <code>4922</code>.</p>
+<h4 id="dynamic-analysis">Dynamic Analysis</h4>
+<p>To extract the encrypted data and seed, a breakpoint is set at the call to <code>xor_prng_validate_input</code> in the IDA debugger. When the breakpoint is hit after providing test input, the register values reveal the function arguments:</p>
+<ul>
+<li><strong>RSI (first argument / args1)</strong>: <code>0x000001C283DB7878</code> - pointer to the Entry structure</li>
+<li><strong>R13 (second argument / args2)</strong>: pointer to user input</li>
+<li><strong>RDX (third argument / args3)</strong>: input length</li>
+</ul>
+<p>Examining the memory at the Entry structure pointer (RSI) reveals the structure fields:</p>
+<ul>
+<li><strong><code>*(RSI + 0x8)</code></strong>: pointer to encrypted buffer</li>
+<li><strong><code>*(RSI + 0x10)</code></strong>: buffer length (64 bytes)</li>
+<li><strong><code>*(RSI + 0x18)</code></strong>: seed value <code>0x133A</code></li>
+</ul>
+<p>Following the pointer at offset <code>+0x8</code> to the encrypted buffer and dumping 64 bytes yields:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">encrypted_hex</span> <span class="o">=</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;F5 40 C3 B7 2D EE C9 CE 88 F6 C1 56 48 14 59 0B &#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;6A 38 52 79 EF B6 33 7F EE C8 61 5E B7 DC 95 7F &#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;62 1B D9 87 9E C6 90 CD 3B F1 65 C2 56 E2 07 67 &#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;AB D0 EA 94 3E 1C F6 B6 2C 24 F2 23 E9 19 97 32&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></div><h4 id="implementing-the-prng-algorithm">Implementing the PRNG Algorithm</h4>
+<p>The PRNG algorithm must be replicated exactly as implemented in the binary to generate the correct keystream. Three helper functions are needed:</p>
+<ul>
+<li><strong><code>ror()</code></strong> - Performs a right bitwise rotation, shifting bits to the right with wraparound</li>
+<li><strong><code>rol()</code></strong> - Performs a left bitwise rotation, shifting bits to the left with wraparound</li>
+<li><strong><code>generate_stream()</code></strong> - Implements the custom PRNG algorithm using rotate operations and arithmetic to produce the keystream bytes</li>
+</ul>
+<p>With the encrypted data, seed, and PRNG implementation, the complete decryption script can be written:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="ch">#!/usr/bin/env python3</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">ror</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">bits</span><span class="o">=</span><span class="mi">32</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;&#34;&#34;Rotate right operation&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">count</span> <span class="o">%=</span> <span class="n">bits</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">((</span><span class="n">value</span> <span class="o">&gt;&gt;</span> <span class="n">count</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">value</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="n">bits</span> <span class="o">-</span> <span class="n">count</span><span class="p">)))</span> <span class="o">&amp;</span> <span class="p">((</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">bits</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">rol</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">bits</span><span class="o">=</span><span class="mi">32</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;&#34;&#34;Rotate left operation&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">count</span> <span class="o">%=</span> <span class="n">bits</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">((</span><span class="n">value</span> <span class="o">&lt;&lt;</span> <span class="n">count</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">value</span> <span class="o">&gt;&gt;</span> <span class="p">(</span><span class="n">bits</span> <span class="o">-</span> <span class="n">count</span><span class="p">)))</span> <span class="o">&amp;</span> <span class="p">((</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">bits</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">generate_stream</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;&#34;&#34;Generate PRNG keystream matching the binary&#39;s algorithm&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">output</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">length</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ror_val</span> <span class="o">=</span> <span class="n">ror</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">v6</span> <span class="o">=</span> <span class="n">seed</span> <span class="o">*</span> <span class="p">((</span><span class="n">ror_val</span> <span class="o">&amp;</span> <span class="mh">0xFFFFFFFC</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">rol</span><span class="p">(</span><span class="o">~</span><span class="n">seed</span> <span class="o">&amp;</span> <span class="mh">0xFFFFFFFF</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="o">|</span> <span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">shift_amount</span> <span class="o">=</span> <span class="p">(</span><span class="o">~</span><span class="n">seed</span> <span class="o">&amp;</span> <span class="mh">0xF</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">shift</span> <span class="o">=</span> <span class="p">(</span><span class="n">seed</span> <span class="o">&gt;&gt;</span> <span class="n">shift_amount</span><span class="p">)</span> <span class="o">%</span> <span class="mh">0x18</span> <span class="k">if</span> <span class="n">shift_amount</span> <span class="o">&lt;</span> <span class="mi">32</span> <span class="k">else</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">        <span class="n">stream_byte</span> <span class="o">=</span> <span class="p">(</span><span class="n">v6</span> <span class="o">&gt;&gt;</span> <span class="n">shift</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xFF</span>
+</span></span><span class="line"><span class="cl">        <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stream_byte</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">seed</span> <span class="o">=</span> <span class="n">v6</span> <span class="o">&amp;</span> <span class="mh">0xFFFFFFFF</span>  <span class="c1"># Keep seed 32-bit</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">output</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Encrypted data extracted from memory</span>
+</span></span><span class="line"><span class="cl"><span class="n">encrypted_hex</span> <span class="o">=</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;F5 40 C3 B7 2D EE C9 CE 88 F6 C1 56 48 14 59 0B &#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;6A 38 52 79 EF B6 33 7F EE C8 61 5E B7 DC 95 7F &#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;62 1B D9 87 9E C6 90 CD 3B F1 65 C2 56 E2 07 67 &#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;AB D0 EA 94 3E 1C F6 B6 2C 24 F2 23 E9 19 97 32&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">encrypted</span> <span class="o">=</span> <span class="nb">bytes</span><span class="o">.</span><span class="n">fromhex</span><span class="p">(</span><span class="n">encrypted_hex</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">seed</span> <span class="o">=</span> <span class="mh">0x133A</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Generate keystream</span>
+</span></span><span class="line"><span class="cl"><span class="n">stream</span> <span class="o">=</span> <span class="n">generate_stream</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">encrypted</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Decrypt by XORing encrypted data with keystream</span>
+</span></span><span class="line"><span class="cl"><span class="n">plaintext</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">b</span> <span class="o">^</span> <span class="n">s</span> <span class="k">for</span> <span class="n">b</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">encrypted</span><span class="p">,</span> <span class="n">stream</span><span class="p">)])</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">plaintext</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;replace&#39;</span><span class="p">))</span>
+</span></span></code></pre></div><p><strong>Expected input:</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">a4ec6d39192922bdec0e310db3dda25f21f1d7e8e9e68cfebc156553e4123b03
+</span></span></code></pre></div><h4 id="stage-2-extraction">Stage 2 extraction</h4>
+<p>Providing the correct input string prints the success message &ldquo;Thank you, Bingus! But our princess is in another castle!&rdquo; however there is no additional hint on how go get the flag. To understand the binary&rsquo;s behavior after successful validation, Process Monitor (Procmon) from Sysinternals Suite is used to observe file system and registry activity during execution.</p>
+<p>Running the binary under Procmon with the correct input reveals a suspicious entry:</p>
+<p><img src="/procmon_Exodus.png" alt="Procmon showing Exodus directory check"></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Operation: CreateFile
+</span></span><span class="line"><span class="cl">Path: C:\Users\ladmin\AppData\Roaming\Exodus
+</span></span><span class="line"><span class="cl">Result: NAME NOT FOUND
+</span></span><span class="line"><span class="cl">Desired Access: Read Attributes, Synchronize
+</span></span></code></pre></div><p>In Windows, when <code>CreateFile</code> is called with <code>Desired Access: Read Attributes, Synchronize</code> on a path without a file extension, this indicates a directory existence check rather than an attempt to open a file. The <code>NAME NOT FOUND</code> result means the program is checking for the <code>Exodus</code> directory, which does not exist.</p>
+<p>This directory can be created manually in the expected APPDATA location.
+Running the binary again with the correct input now produces different behavior. Procmon shows successful file operations, and examining the Exodus directory reveals that a new file has been created:</p>
+<p><img src="/Second_Stage_exe.png" alt="Stage 2 binary created in Exodus folder"></p>
+<p>The file <code>rust-tickler-3-stage-2.exe</code> appears in the directory. Based on the dynamic analysis and the appearance of the second stage, it can be deduced that the second-stage binary is embedded in encrypted form within the first stage. After successful input validation and directory verification, the program decrypts this embedded data and writes the resulting executable to disk. The second stage binary does not execute automatically and must be run manually to continue the challenge.</p>
+<hr>
+<h3 id="stage-2-rust-tickler-3-stage-2exe">Stage 2: rust-tickler-3-stage-2.exe</h3>
+<h4 id="initial-analysis-1">Initial Analysis</h4>
+<p>The second stage binary <code>rust-tickler-3-stage-2.exe</code> is opened in IDA Free for decompilation and analysis. Following a similar methodology to Stage 1, the analysis begins by locating the main function and examining the overall code structure. An initial execution without breakpoints confirms the executable prompts for user input &ldquo;Okay for real this time, the flag is actually going to be the password. I definitely not in the icon file&hellip;&rdquo;, indicating another validation challenge.</p>
+<p>To locate the validation logic, breakpoints are set on interesting code sections, particularly conditional statements and function calls that could be involved in input verification. After providing test input and continuing execution through the debugger, two critical functions are discovered that handle the cryptographic validation process.</p>
+<h4 id="identifying-the-validation-functions">Identifying the Validation Functions</h4>
+<p>Through dynamic execution with breakpoints the validation logic is traced to a function at <code>BASE+1CC0</code>, renamed to <code>compare_function</code> for clarity. This function acts as a wrapper that extracts parameters from two structures and passes them to the actual validation routine at <code>BASE+1E30</code>, renamed to <code>validate_and_check</code>.</p>
+<p>Analysis of <code>validate_and_check</code> reveals it encrypts the user&rsquo;s input using AES-256-CBC and compares the result against pre-computed expected ciphertext stored in memory. The validation succeeds only if the encrypted input matches the expected ciphertext exactly, block by block.</p>
+<p><strong>The compare_function</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">compare_function</span><span class="p">(</span><span class="n">undefined8</span> <span class="o">*</span><span class="n">param_1</span><span class="p">,</span> <span class="n">undefined4</span> <span class="o">*</span><span class="n">param_2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">validate_and_check</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">      <span class="n">param_1</span> <span class="o">+</span> <span class="mi">6</span><span class="p">,</span>                      <span class="c1">// scratch_ctx
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="o">*</span><span class="n">param_1</span><span class="p">,</span>                         <span class="c1">// expected_ciphertext_ptr
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="n">param_1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>                       <span class="c1">// expected_padded_len (48)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="n">param_1</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>                       <span class="c1">// key_ptr
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="o">*</span><span class="p">(</span><span class="n">undefined4</span> <span class="o">*</span><span class="p">)(</span><span class="n">param_1</span> <span class="o">+</span> <span class="mi">3</span><span class="p">),</span>     <span class="c1">// key_len (32)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="n">param_1</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span>                       <span class="c1">// iv_ptr
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="o">*</span><span class="p">(</span><span class="n">undefined4</span> <span class="o">*</span><span class="p">)(</span><span class="n">param_1</span> <span class="o">+</span> <span class="mi">5</span><span class="p">),</span>     <span class="c1">// iv_len (16)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="o">*</span><span class="n">param_2</span><span class="p">,</span>                         <span class="c1">// user_input_ptr
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="n">param_2</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>                      <span class="c1">// user_input_len
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>This function acts as a wrapper, extracting fields from two parameter structures:</p>
+<ul>
+<li><code>param_1</code>: A structure containing cryptographic material and validation parameters</li>
+<li><code>param_2</code>: A structure containing the user&rsquo;s input and its length</li>
+</ul>
+<p>By analyzing the memory dump at <code>param_1</code> (RCX register) during dynamic analysis, the structure layout is determined as follows:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// Structure 1 - Cryptographic Material (verified via memory dump)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">param_1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="nf">expected_ciphertext_ptr</span>  <span class="p">(</span><span class="mi">48</span> <span class="n">bytes</span> <span class="n">of</span> <span class="n">AES</span> <span class="n">ciphertext</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">param_1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="nf">expected_padded_len</span>      <span class="p">(</span><span class="mi">48</span> <span class="n">bytes</span> <span class="n">input</span> <span class="n">length</span> <span class="n">after</span> <span class="n">PKCS</span><span class="err">#</span><span class="mi">7</span> <span class="n">padding</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">param_1</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="nf">key_ptr</span>                  <span class="p">(</span><span class="mi">32</span> <span class="n">byte</span> <span class="n">AES</span><span class="o">-</span><span class="mi">256</span> <span class="n">key</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">param_1</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="nf">key_len</span>                  <span class="p">(</span><span class="mi">32</span> <span class="n">bytes</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">param_1</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="nf">iv_ptr</span>                   <span class="p">(</span><span class="mi">16</span> <span class="n">byte</span> <span class="n">initialization</span> <span class="n">vector</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">param_1</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="nf">iv_len</span>                   <span class="p">(</span><span class="mi">16</span> <span class="n">bytes</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">param_1</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="nf">scratch_ctx</span>              <span class="p">(</span><span class="n">Context</span> <span class="n">buffer</span> <span class="k">for</span> <span class="n">encryption</span> <span class="n">operations</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Structure 2 - User Input
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">param_2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="nf">user_input_ptr</span>           <span class="p">(</span><span class="n">Pointer</span> <span class="n">to</span> <span class="n">users</span> <span class="n">input</span> <span class="n">string</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">param_2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="nf">user_input_len</span>           <span class="p">(</span><span class="n">Length</span> <span class="n">of</span> <span class="n">users</span> <span class="n">input</span><span class="p">)</span>
+</span></span></code></pre></div><p><strong>The validate_and_check Function</strong></p>
+<p>This function implements the cryptographic validation using AES-256-CBC. Before any encryption occurs, it performs input length validation:<br>
+(Note: The following code snippet contains only the relevant portions necessary for understanding the validation logic, not the complete function implementation)</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kr">__int64</span> <span class="kr">__fastcall</span> <span class="nf">validate_and_check</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="kr">__int64</span> <span class="o">*</span><span class="n">scratch_ctx</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="kr">__int64</span> <span class="n">expected_ciphertext_ptr</span><span class="p">,</span>      <span class="c1">// Pointer to expected ciphertext
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="kt">size_t</span> <span class="n">expected_padded_len</span><span class="p">,</span>           <span class="o">//</span> <span class="n">Expected</span> <span class="n">length</span> <span class="n">after</span> <span class="nf">padding</span> <span class="p">(</span><span class="mi">48</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="kr">__int64</span> <span class="n">key_ptr</span><span class="p">,</span>                      <span class="c1">// Pointer to AES-256 key
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="kt">unsigned</span> <span class="kr">__int64</span> <span class="n">key_len</span><span class="p">,</span>             <span class="c1">// Key length (32 bytes)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="kr">__int64</span> <span class="n">iv_ptr</span><span class="p">,</span>                       <span class="c1">// Pointer to IV
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="kt">unsigned</span> <span class="kr">__int64</span> <span class="n">iv_len</span><span class="p">,</span>              <span class="c1">// IV length (16 bytes)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="kr">__int64</span> <span class="n">user_input_ptr</span><span class="p">,</span>               <span class="c1">// Pointer to users input
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="kt">size_t</span> <span class="n">user_input_len</span><span class="p">)</span>                <span class="c1">// Length of users input
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">block_size</span> <span class="o">=</span> <span class="nf">get_divisor_value</span><span class="p">(</span><span class="n">scratch_ctx</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="n">block_size</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">goto</span> <span class="n">LABEL_ERROR</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// Calculate expected padded length from user input
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">calculated_padded_len</span> <span class="o">=</span> <span class="n">block_size</span> <span class="o">+</span> <span class="n">user_input_len</span> <span class="o">-</span> <span class="p">(</span><span class="n">user_input_len</span> <span class="o">%</span> <span class="n">block_size</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span> <span class="n">expected_padded_len</span> <span class="o">!=</span> <span class="n">calculated_padded_len</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">goto</span> <span class="n">LABEL_ERROR</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// Initialize crypto context with key and IV
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nf">initialize_crypto_ctx__</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">      <span class="p">(</span><span class="n">DWORD</span> <span class="o">*</span><span class="p">)</span><span class="n">expected_encrypted_chunk</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="o">*</span><span class="n">scratch_ctx</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="mi">0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="n">key_ptr</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="n">key_len</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="n">iv_ptr</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="n">iv_len</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Encryption loop - process input in blocks
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">for</span> <span class="p">(</span><span class="n">block_offset</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">block_offset</span> <span class="o">&lt;</span> <span class="n">expected_padded_len</span><span class="p">;</span> <span class="n">block_offset</span> <span class="o">+=</span> <span class="n">block_size</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// Encrypt current block of user input
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">encrypt_buffer_evp</span><span class="p">(</span><span class="o">&amp;</span><span class="n">v23</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">v21</span><span class="p">,</span> <span class="n">user_input_ptr</span><span class="p">,</span> <span class="n">block_offset</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                       <span class="p">(</span><span class="kr">__int64</span><span class="p">)</span><span class="n">expected_encrypted_chunk</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">block_size</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// Compare encrypted block against expected ciphertext
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span> <span class="nf">memcmp</span><span class="p">(</span><span class="n">expected_encrypted_chunk</span><span class="p">,</span> <span class="p">(</span><span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="p">)(</span><span class="n">user_input_ptr</span> <span class="o">+</span> <span class="n">v18</span><span class="p">),</span> <span class="n">value_16</span><span class="p">)</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>The validation function operates as follows:</p>
+<ol>
+<li><strong>Length Validation</strong>: Calculates the expected padded length from the user&rsquo;s input</li>
+<li><strong>Context Initialization</strong>: Sets up the AES-256-CBC encryption context using the 32-byte key and 16-byte IV</li>
+<li><strong>Block-by-block Encryption</strong>: Encrypts the user&rsquo;s input one 16-byte AES block at a time</li>
+<li><strong>Comparison</strong>: After encrypting each block, compares it against the corresponding block of expected ciphertext stored in memory</li>
+<li><strong>Success Condition</strong>: All three encrypted blocks must match the expected ciphertext for validation to succeed</li>
+</ol>
+<p>To recover the expected input, the expected ciphertext can be extracted from memory and decrypted using the key and IV, directly revealing the expected input.</p>
+<h4 id="dynamic-analysis-1">Dynamic Analysis</h4>
+<p>To extract the cryptographic material (AES key, IV, and expected ciphertext), two breakpoints are placed in the IDA debugger within the validation flow.</p>
+<p><strong>Breakpoint 1: initialize_crypto_ctx__</strong></p>
+<p>A breakpoint at the call to <code>initialize_crypto_ctx__</code> (<code>BASE+2300</code>) captures the cryptographic parameters being initialized.</p>
+<ul>
+<li>First 4 arguments: <code>RCX</code>, <code>RDX</code>, <code>R8</code>, <code>R9</code></li>
+</ul>
+<p><strong>Register values at breakpoint:</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">RCX: 0x30                      ; arg1: Buffer size (48 bytes)
+</span></span><span class="line"><span class="cl">RDX: 0x6                       ; arg2: Algorithm identifier (AES-256)
+</span></span><span class="line"><span class="cl">R8:  0x30                      ; arg3: Key material length (48 bytes)
+</span></span><span class="line"><span class="cl">R9:  0x00007FF7285FD128        ; arg4: Pointer to key+IV material
+</span></span></code></pre></div><p>Examining the memory at <code>R9</code> (address <code>0x7FF7285FD128</code>) and dumping 48 bytes reveals the cryptographic material:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">00007FF7285FD128: D4 C3 94 86 FD F0 42 83  F5 D9 64 36 BA 68 EA 1C
+</span></span><span class="line"><span class="cl">00007FF7285FD138: 4F 41 94 79 6A F8 2D 0F  8E ED 7C 12 F5 3F A0 7C
+</span></span><span class="line"><span class="cl">00007FF7285FD148: 53 9F B3 1E 1C C1 34 42  42 0D 03 93 97 E9 17 77
+</span></span></code></pre></div><p>Since the total length is 48 bytes and AES-256 requires a 32-byte key and 16-byte IV, the data can be split as follows:</p>
+<p><strong>Extracted cryptographic material:</strong></p>
+<ul>
+<li>
+<p><strong>AES-256 Key</strong> (bytes 0-31):</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">D4 C3 94 86 FD F0 42 83 F5 D9 64 36 BA 68 EA 1C
+</span></span><span class="line"><span class="cl">4F 41 94 79 6A F8 2D 0F 8E ED 7C 12 F5 3F A0 7C
+</span></span></code></pre></div></li>
+<li>
+<p><strong>Initialization Vector (IV)</strong> (bytes 32-47):</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">53 9F B3 1E 1C C1 34 42 42 0D 03 93 97 E9 17 77
+</span></span></code></pre></div></li>
+</ul>
+<p><strong>Breakpoint 2: memcmp - Extracting Expected Ciphertext</strong></p>
+<p>A breakpoint at the <code>memcmp</code> (<code>BASE+2031</code>) call reveals where encrypted blocks are compared against the expected ciphertext. This function is called once per AES block (16 bytes), so multiple hits are expected as the program validates each block.</p>
+<p><strong>x64 calling convention for memcmp:</strong></p>
+<ul>
+<li><code>RCX</code>: Pointer to first buffer (the encrypted user input)</li>
+<li><code>RDX</code>: Pointer to second buffer (expected ciphertext)</li>
+<li><code>R8</code>: Number of bytes to compare</li>
+</ul>
+<p><strong>Register values at breakpoint:</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">RCX: 0x0000001B6078F980    ; The encrypted input block
+</span></span><span class="line"><span class="cl">RDX: 0x00007FF7285FD0F8    ; Expected ciphertext block 1
+</span></span><span class="line"><span class="cl">R8:  0x10                  ; 16 bytes (one AES block)
+</span></span></code></pre></div><p>The value at <code>RCX</code> shows what the test input was encrypted to (not needed). The essential data is at <code>RDX</code> the expected ciphertext address.</p>
+<p>Since the expected input is 38 bytes and AES operates on 16-byte blocks, the total encrypted size with PKCS#7 padding is 48 bytes (3 blocks). Dumping 48 bytes from the ciphertext address reveals the complete expected ciphertext:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">00007FF7285FD0F8: CB 58 4B 62 03 5D 13 8F  77 BC 98 10 F0 0F 1A 20
+</span></span><span class="line"><span class="cl">00007FF7285FD108: 20 70 0F 8F BF 0D 75 DC  A3 FD 71 08 5F 14 67 CD
+</span></span><span class="line"><span class="cl">00007FF7285FD118: E9 D0 5F 1F 83 BB C7 6B  7D 9B EB 42 F7 51 00 95
+</span></span></code></pre></div><p><strong>Complete expected ciphertext (48 bytes):</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Block 1 (0-15):   CB 58 4B 62 03 5D 13 8F 77 BC 98 10 F0 0F 1A 20
+</span></span><span class="line"><span class="cl">Block 2 (16-31):  20 70 0F 8F BF 0D 75 DC A3 FD 71 08 5F 14 67 CD
+</span></span><span class="line"><span class="cl">Block 3 (32-47):  E9 D0 5F 1F 83 BB C7 6B 7D 9B EB 42 F7 51 00 95
+</span></span></code></pre></div><h4 id="decryption-script">Decryption Script</h4>
+<p>With all the cryptographic material extracted (AES-256 key, IV, and expected ciphertext), the solution involves decrypting the expected ciphertext using the extracted key and IV, which directly reveals the flag.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="ch">#!/usr/bin/env python3</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">Crypto.Cipher</span> <span class="kn">import</span> <span class="n">AES</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Expected ciphertext extracted from memory at 0x7FF7285FD0F8</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Captured from the memcmp breakpoint - this is what the encrypted</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># input is compared against</span>
+</span></span><span class="line"><span class="cl"><span class="n">ciphertext</span> <span class="o">=</span> <span class="nb">bytes</span><span class="o">.</span><span class="n">fromhex</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;CB584B62035D138F77BC9810F00F1A20&#39;</span>  <span class="c1"># Block 1</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;20700F8FBF0D75DCA3FD71085F1467CD&#39;</span>  <span class="c1"># Block 2</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;E9D05F1F83BBC76B7D9BEB42F7510095&#39;</span>  <span class="c1"># Block 3</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># AES-256 Key extracted from initialize_crypto_ctx__ call</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Found in R9 register (0x7FF7285FD128), bytes 0-31</span>
+</span></span><span class="line"><span class="cl"><span class="n">key</span> <span class="o">=</span> <span class="nb">bytes</span><span class="o">.</span><span class="n">fromhex</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;D4C39486FDF04283F5D96436BA68EA1C&#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;4F4194796AF82D0F8EED7C12F53FA07C&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># IV (Initialization Vector) extracted from initialize_crypto_ctx__ call</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Found in R9 register (0x7FF7285FD148), bytes 32-47</span>
+</span></span><span class="line"><span class="cl"><span class="n">iv</span> <span class="o">=</span> <span class="nb">bytes</span><span class="o">.</span><span class="n">fromhex</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;539FB31E1CC13442420D039397E91777&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s2">&#34;[*] Crypto material extracted from memory:&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;    Key:        </span><span class="si">{</span><span class="n">key</span><span class="o">.</span><span class="n">hex</span><span class="p">()</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;    IV:         </span><span class="si">{</span><span class="n">iv</span><span class="o">.</span><span class="n">hex</span><span class="p">()</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;    Ciphertext: </span><span class="si">{</span><span class="n">ciphertext</span><span class="o">.</span><span class="n">hex</span><span class="p">()</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Decrypt using AES-256-CBC</span>
+</span></span><span class="line"><span class="cl"><span class="n">cipher</span> <span class="o">=</span> <span class="n">AES</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">AES</span><span class="o">.</span><span class="n">MODE_CBC</span><span class="p">,</span> <span class="n">iv</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">plaintext</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># The answer is 38 bytes, rest is PKCS#7 padding (0x0A repeated 10 times)</span>
+</span></span><span class="line"><span class="cl"><span class="n">answer</span> <span class="o">=</span> <span class="n">plaintext</span><span class="p">[:</span><span class="mi">38</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;[+] </span><span class="si">{</span><span class="n">answer</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p><strong>Output:</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="o">[</span>*<span class="o">]</span> Crypto material extracted from memory:
+</span></span><span class="line"><span class="cl">    Key:        d4c39486fdf04283f5d96436ba68ea1c4f4194796af82d0f8eed7c12f53fa07c
+</span></span><span class="line"><span class="cl">    IV:         539fb31e1cc13442420d039397e91777
+</span></span><span class="line"><span class="cl">    Ciphertext: cb584b62035d138f77bc9810f00f1a2020700f8fbf0d75dca3fd71085f1467cde9d05f1f83bbc76b7d9beb42f7510095
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">[</span>+<span class="o">]</span> flag<span class="o">{</span>fb8de641f383151222845d9b991a17c2<span class="o">}</span>
+</span></span></code></pre></div>
+    </div>
+</div>
+
+            </main>
+        </div>
+
+
+        <footer class="footer">
+    
+        <span>
+            © 2025 XeroExecute Blog, Built with
+            <a href="https://gohugo.io" class="footerLink">Hugo</a> and
+            <a href="https://github.com/LordMathis/hugo-theme-nightfall" class="footerLink">Nightfall</a> theme
+        </span>
+    
+</footer>
+    </div>
+
+</body>
+
+</html>
