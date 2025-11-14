@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Burp-Suite on XeroExecute Blog</title>
+    <link>https://XeroExecute.github.io/tags/burp-suite/</link>
+    <description>Recent content in Burp-Suite on XeroExecute Blog</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <managingEditor>sir_xxxx@protonmail.com (XeroExecute Blog)</managingEditor>
+    <webMaster>sir_xxxx@protonmail.com (XeroExecute Blog)</webMaster>
+    <lastBuildDate>Thu, 31 Oct 2024 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://XeroExecute.github.io/tags/burp-suite/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Huntress 2024</title>
+      <link>https://XeroExecute.github.io/posts/huntress2024/</link>
+      <pubDate>Thu, 31 Oct 2024 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
+      <guid>https://XeroExecute.github.io/posts/huntress2024/</guid>
+      <description>My notes on five challenges from Huntress CTF 2024: Whamazon, Keyboard Junkie, MOVEable, Strange Calc and OceanLocust. The challenges were solved as part of the Dombusters team.</description>
+    </item>
+    <item>
+      <title>noscript (web)</title>
+      <link>https://XeroExecute.github.io/posts/noscript/</link>
+      <pubDate>Fri, 21 Jun 2024 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
+      <guid>https://XeroExecute.github.io/posts/noscript/</guid>
+      <description>Ignite it to steal the cookie!</description>
+    </item>
+  </channel>
+</rss>

@@ -32,10 +32,24 @@
       <description></description>
     </item>
     <item>
-      <title>Re</title>
-      <link>https://XeroExecute.github.io/tags/re/</link>
+      <title>Ida</title>
+      <link>https://XeroExecute.github.io/tags/ida/</link>
       <pubDate>Mon, 03 Nov 2025 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
-      <guid>https://XeroExecute.github.io/tags/re/</guid>
+      <guid>https://XeroExecute.github.io/tags/ida/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Procmon</title>
+      <link>https://XeroExecute.github.io/tags/procmon/</link>
+      <pubDate>Mon, 03 Nov 2025 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
+      <guid>https://XeroExecute.github.io/tags/procmon/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Reverse-Engineering</title>
+      <link>https://XeroExecute.github.io/tags/reverse-engineering/</link>
+      <pubDate>Mon, 03 Nov 2025 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
+      <guid>https://XeroExecute.github.io/tags/reverse-engineering/</guid>
       <description></description>
     </item>
     <item>
@@ -46,17 +60,24 @@
       <description></description>
     </item>
     <item>
-      <title>Exploitation</title>
-      <link>https://XeroExecute.github.io/tags/exploitation/</link>
+      <title>Binary-Exploitation</title>
+      <link>https://XeroExecute.github.io/tags/binary-exploitation/</link>
       <pubDate>Sat, 01 Nov 2025 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
-      <guid>https://XeroExecute.github.io/tags/exploitation/</guid>
+      <guid>https://XeroExecute.github.io/tags/binary-exploitation/</guid>
       <description></description>
     </item>
     <item>
-      <title>Pwn</title>
-      <link>https://XeroExecute.github.io/tags/pwn/</link>
+      <title>Got-Hijacking</title>
+      <link>https://XeroExecute.github.io/tags/got-hijacking/</link>
       <pubDate>Sat, 01 Nov 2025 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
-      <guid>https://XeroExecute.github.io/tags/pwn/</guid>
+      <guid>https://XeroExecute.github.io/tags/got-hijacking/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Pwntools</title>
+      <link>https://XeroExecute.github.io/tags/pwntools/</link>
+      <pubDate>Sat, 01 Nov 2025 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
+      <guid>https://XeroExecute.github.io/tags/pwntools/</guid>
       <description></description>
     </item>
     <item>
@@ -67,6 +88,34 @@
       <description></description>
     </item>
     <item>
+      <title>Ghidra</title>
+      <link>https://XeroExecute.github.io/tags/ghidra/</link>
+      <pubDate>Fri, 27 Jun 2025 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
+      <guid>https://XeroExecute.github.io/tags/ghidra/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Gdb</title>
+      <link>https://XeroExecute.github.io/tags/gdb/</link>
+      <pubDate>Mon, 31 Mar 2025 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
+      <guid>https://XeroExecute.github.io/tags/gdb/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Swampctf</title>
+      <link>https://XeroExecute.github.io/tags/swampctf/</link>
+      <pubDate>Mon, 31 Mar 2025 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
+      <guid>https://XeroExecute.github.io/tags/swampctf/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Binwalk</title>
+      <link>https://XeroExecute.github.io/tags/binwalk/</link>
+      <pubDate>Thu, 20 Mar 2025 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
+      <guid>https://XeroExecute.github.io/tags/binwalk/</guid>
+      <description></description>
+    </item>
+    <item>
       <title>Cloud</title>
       <link>https://XeroExecute.github.io/tags/cloud/</link>
       <pubDate>Thu, 20 Mar 2025 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
@@ -74,10 +123,45 @@
       <description></description>
     </item>
     <item>
+      <title>Cyberchef</title>
+      <link>https://XeroExecute.github.io/tags/cyberchef/</link>
+      <pubDate>Thu, 20 Mar 2025 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
+      <guid>https://XeroExecute.github.io/tags/cyberchef/</guid>
+      <description></description>
+    </item>
+    <item>
       <title>Forensics</title>
       <link>https://XeroExecute.github.io/tags/forensics/</link>
       <pubDate>Thu, 20 Mar 2025 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
       <guid>https://XeroExecute.github.io/tags/forensics/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Sqlmap</title>
+      <link>https://XeroExecute.github.io/tags/sqlmap/</link>
+      <pubDate>Thu, 20 Mar 2025 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
+      <guid>https://XeroExecute.github.io/tags/sqlmap/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Tshark</title>
+      <link>https://XeroExecute.github.io/tags/tshark/</link>
+      <pubDate>Thu, 20 Mar 2025 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
+      <guid>https://XeroExecute.github.io/tags/tshark/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Irisctf</title>
+      <link>https://XeroExecute.github.io/tags/irisctf/</link>
+      <pubDate>Mon, 06 Jan 2025 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
+      <guid>https://XeroExecute.github.io/tags/irisctf/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Burp-Suite</title>
+      <link>https://XeroExecute.github.io/tags/burp-suite/</link>
+      <pubDate>Thu, 31 Oct 2024 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
+      <guid>https://XeroExecute.github.io/tags/burp-suite/</guid>
       <description></description>
     </item>
     <item>

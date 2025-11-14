@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Irisctf on XeroExecute Blog</title>
+    <link>https://XeroExecute.github.io/tags/irisctf/</link>
+    <description>Recent content in Irisctf on XeroExecute Blog</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <managingEditor>sir_xxxx@protonmail.com (XeroExecute Blog)</managingEditor>
+    <webMaster>sir_xxxx@protonmail.com (XeroExecute Blog)</webMaster>
+    <lastBuildDate>Mon, 06 Jan 2025 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://XeroExecute.github.io/tags/irisctf/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Sqlate IrisCTF 2025 (pwn)</title>
+      <link>https://XeroExecute.github.io/posts/sqlate/</link>
+      <pubDate>Mon, 06 Jan 2025 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
+      <guid>https://XeroExecute.github.io/posts/sqlate/</guid>
+      <description>Exploit writeup for the Sqlate challenge from IrisCTF 2025 by lambda, involving a buffer overflow in a custom encoding mechanism to escalate privileges and retrieve the flag.</description>
+    </item>
+  </channel>
+</rss>

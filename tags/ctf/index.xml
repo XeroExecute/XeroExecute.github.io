@@ -25,6 +25,27 @@
       <description>Complete writeup for &amp;ldquo;No Limits&amp;rdquo; PWN challenge from Huntress CTF 2025. Exploit a parent-child process architecture to bypass seccomp restrictions using /proc/pid/mem and GOT hijacking techniques.</description>
     </item>
     <item>
+      <title>TryHackMe: Industrial Intrusion - auth (9005)</title>
+      <link>https://XeroExecute.github.io/posts/industrialctf/</link>
+      <pubDate>Fri, 27 Jun 2025 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
+      <guid>https://XeroExecute.github.io/posts/industrialctf/</guid>
+      <description>A reverse engineering challenge involving XOR decoding and memory comparison to retrieve the flag from a remote industrial gateway.</description>
+    </item>
+    <item>
+      <title>SwampCTF: You Shall Not Passss</title>
+      <link>https://XeroExecute.github.io/posts/you_shall_not_passss/</link>
+      <pubDate>Mon, 31 Mar 2025 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
+      <guid>https://XeroExecute.github.io/posts/you_shall_not_passss/</guid>
+      <description>This writeup details the solution to the &amp;ldquo;You Shall Not Passss&amp;rdquo; reverse engineering challenge from SwampCTF, involving dynamic analysis with Ghidra and gdb to decrypt the flag, and analysis of shellcode execution.</description>
+    </item>
+    <item>
+      <title>Try Hack Me Hackfinity Battle CTF</title>
+      <link>https://XeroExecute.github.io/posts/thmhackfinitybattle/</link>
+      <pubDate>Thu, 20 Mar 2025 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
+      <guid>https://XeroExecute.github.io/posts/thmhackfinitybattle/</guid>
+      <description>Try Hack Me Hackfinity Battle CTF Writeups</description>
+    </item>
+    <item>
       <title>Sqlate IrisCTF 2025 (pwn)</title>
       <link>https://XeroExecute.github.io/posts/sqlate/</link>
       <pubDate>Mon, 06 Jan 2025 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>

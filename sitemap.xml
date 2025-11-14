@@ -17,13 +17,19 @@
     <loc>https://XeroExecute.github.io/tags/huntress/</loc>
     <lastmod>2025-11-03T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>https://XeroExecute.github.io/tags/ida/</loc>
+    <lastmod>2025-11-03T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://XeroExecute.github.io/posts/</loc>
     <lastmod>2025-11-03T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://XeroExecute.github.io/tags/re/</loc>
+    <loc>https://XeroExecute.github.io/tags/procmon/</loc>
     <lastmod>2025-11-03T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://XeroExecute.github.io/categories/reverse-engineering/</loc>
+    <lastmod>2025-11-03T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://XeroExecute.github.io/tags/reverse-engineering/</loc>
     <lastmod>2025-11-03T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://XeroExecute.github.io/tags/rust/</loc>
@@ -41,35 +47,65 @@
     <loc>https://XeroExecute.github.io/categories/binary-exploitation/</loc>
     <lastmod>2025-11-03T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://XeroExecute.github.io/tags/exploitation/</loc>
+    <loc>https://XeroExecute.github.io/tags/binary-exploitation/</loc>
+    <lastmod>2025-11-03T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://XeroExecute.github.io/tags/got-hijacking/</loc>
     <lastmod>2025-11-03T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://XeroExecute.github.io/posts/nolimits/</loc>
     <lastmod>2025-11-03T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://XeroExecute.github.io/tags/pwn/</loc>
+    <loc>https://XeroExecute.github.io/tags/pwntools/</loc>
     <lastmod>2025-11-03T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://XeroExecute.github.io/tags/seccomp/</loc>
     <lastmod>2025-11-03T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>https://XeroExecute.github.io/tags/ghidra/</loc>
+    <lastmod>2025-06-27T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://XeroExecute.github.io/posts/industrialctf/</loc>
     <lastmod>2025-06-27T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://XeroExecute.github.io/tags/gdb/</loc>
+    <lastmod>2025-03-31T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://XeroExecute.github.io/tags/swampctf/</loc>
+    <lastmod>2025-03-31T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://XeroExecute.github.io/posts/you_shall_not_passss/</loc>
     <lastmod>2025-03-31T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>https://XeroExecute.github.io/tags/binwalk/</loc>
+    <lastmod>2025-03-20T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://XeroExecute.github.io/tags/cloud/</loc>
+    <lastmod>2025-03-20T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://XeroExecute.github.io/tags/cyberchef/</loc>
     <lastmod>2025-03-20T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://XeroExecute.github.io/tags/forensics/</loc>
     <lastmod>2025-03-20T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>https://XeroExecute.github.io/tags/sqlmap/</loc>
+    <lastmod>2025-03-20T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://XeroExecute.github.io/posts/thmhackfinitybattle/</loc>
     <lastmod>2025-03-20T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>https://XeroExecute.github.io/tags/tshark/</loc>
+    <lastmod>2025-03-20T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://XeroExecute.github.io/tags/irisctf/</loc>
+    <lastmod>2025-01-06T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://XeroExecute.github.io/posts/sqlate/</loc>
     <lastmod>2025-01-06T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://XeroExecute.github.io/tags/burp-suite/</loc>
+    <lastmod>2024-10-31T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://XeroExecute.github.io/posts/huntress2024/</loc>
     <lastmod>2024-10-31T00:00:00+00:00</lastmod>
