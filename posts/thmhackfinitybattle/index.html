@@ -9,7 +9,7 @@ Try Hack Me Hackfinity Battle CTF | XeroExecute Blog
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="">
-<link rel="stylesheet" href="/css/syntax.css">
+<link rel="stylesheet" href="https://XeroExecute.github.io/css/syntax.css">
 
 <meta name="generator" content="Hugo 0.148.2">
 
@@ -19,11 +19,40 @@ Try Hack Me Hackfinity Battle CTF | XeroExecute Blog
 
 
 
-<link href="/css/style.min.0a8bc3dafec135b0e6d7ef7cf60a4d3d04951624dd8ea930e6b7ec4a14d60bcc.css" rel="stylesheet">
+<link href="https://XeroExecute.github.io/css/style.min.0a8bc3dafec135b0e6d7ef7cf60a4d3d04951624dd8ea930e6b7ec4a14d60bcc.css" rel="stylesheet">
 
 
 <meta name="google-site-verification" content="KMv8VXzcE-0mbx2rKXSIZjgzCIVn7tYJOy74vEb3Vo8" />
 
+
+<meta name="description" content="CTF writeups, reverse engineering, malware analysis, and cybersecurity challenges">
+<meta name="keywords" content="CTF, cybersecurity, reverse engineering, malware analysis, writeups, hacking">
+<meta name="author" content="XeroExecute Blog">
+
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://XeroExecute.github.io/posts/thmhackfinitybattle/">
+<meta property="og:title" content="Try Hack Me Hackfinity Battle CTF">
+<meta property="og:description" content="CTF writeups, reverse engineering, malware analysis, and cybersecurity challenges">
+<meta property="og:site_name" content="XeroExecute Blog">
+
+<meta property="article:published_time" content="2025-03-20T00:00:00Z">
+<meta property="article:author" content="XeroExecute Blog">
+
+<meta property="article:tag" content="Forensics">
+
+<meta property="article:tag" content="pwn">
+
+<meta property="article:tag" content="Cloud">
+
+<meta property="article:tag" content="re">
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@XeroExecute">
+<meta name="twitter:creator" content="@XeroExecute">
+<meta name="twitter:title" content="Try Hack Me Hackfinity Battle CTF">
+<meta name="twitter:description" content="CTF writeups, reverse engineering, malware analysis, and cybersecurity challenges">
 
 
 </head>
@@ -35,7 +64,7 @@ Try Hack Me Hackfinity Battle CTF | XeroExecute Blog
     <div class="header">
         <div class="headerLogoContainer">
             <a href="https://XeroExecute.github.io/" class="headerLogo">
-                <img src="/logo.png" alt="XeroExecute" class="logoImg">
+                <img src="https://XeroExecute.github.io/logo.png" alt="XeroExecute" class="logoImg">
             </a>
             <a class="terminal" href="https://XeroExecute.github.io/">
                 <span>blog@XeroExecute.github.io ~ $</span>
@@ -69,10 +98,10 @@ Try Hack Me Hackfinity Battle CTF | XeroExecute Blog
                 
 <dt>tags</dt>
 <dd><span></span>
-    <a href="/tags/forensics/">#Forensics</a><span></span>
-    <a href="/tags/pwn/">#Pwn</a><span></span>
-    <a href="/tags/cloud/">#Cloud</a><span></span>
-    <a href="/tags/re/">#Re</a></dd>
+    <a href="https://XeroExecute.github.io/tags/forensics/">#Forensics</a><span></span>
+    <a href="https://XeroExecute.github.io/tags/pwn/">#Pwn</a><span></span>
+    <a href="https://XeroExecute.github.io/tags/cloud/">#Cloud</a><span></span>
+    <a href="https://XeroExecute.github.io/tags/re/">#Re</a></dd>
             
             
             
@@ -144,7 +173,7 @@ Cipher’s bot army exploited a vulnerability in our web application, planting a
 <h4 id="solution-1">Solution</h4>
 <p>This time, we’re dropped onto the web server itself. I started by checking the Apache logs in <code>/var/log/apache2/</code>. Most were empty or sparse, but <code>other_vhosts_access.log.1</code> had some more content.<br>
 Checking those logs <code>cat /var/log/apache2/other_vhosts_access.log.1</code> I spotted several base64-encoded strings being passed as a <code>query</code> parameter to <code>images.php</code>.</p>
-<p><img src="/infinityshell.png" alt="infinityshell"></p>
+<p><img src="https://XeroExecute.github.io/infinityshell.png" alt="infinityshell"></p>
 <p>One of those base64 encoded strings was: <code>ZWNobyAnVEhNe3N1cDNyXzM0c3lfdzNic2gzbGx9Jwo=</code>  <br>
 Decoding that with CyberChef we get the next flag: <code>echo 'THM{sup3r_34sy_w3bsh3ll}'</code><br>
 Out of curiosity, I also checked the source code of the web app:</p>
@@ -295,7 +324,7 @@ A wave of suspicious web requests has been detected, hammering our database-driv
 <h4 id="solution-4">Solution</h4>
 <p>We’re given a PCAP file containing only HTTP traffic, capturing interactions with a vulnerable web app. From that traffic we need to find a way to extract the flag.<br>
 The PCAP reveals HTTP requests to <code>/search_app/search.php</code>. The requests captured directly stand out, as they are obvious SQL injection attempts.</p>
-<p><img src="/sequeldump1.png" alt="sequeldump1"></p>
+<p><img src="https://XeroExecute.github.io/sequeldump1.png" alt="sequeldump1"></p>
 <p>For example the following one.
 Request:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">GET /search_app/search.php?query<span class="o">=</span>1%20AND%20ORD%28MID%28%28SELECT%20IFNULL%28CAST%28id%20AS%20NCHAR%29%2C0x20%29%20FROM%20profile_db.%60profiles%60%20ORDER%20BY%20id%20LIMIT%206%2C1%29%2C1%2C1%29%29%3E56 HTTP/1.1
@@ -427,7 +456,7 @@ Since manually decoding the entire database isn&rsquo;t something I like to do w
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&#34;__main__&#34;</span><span class="p">:</span>
 </span></span><span class="line"><span class="cl">    <span class="n">main</span><span class="p">()</span>
-</span></span></code></pre></div><p><img src="/sequeldump2.png" alt="sequeldump2"></p>
+</span></span></code></pre></div><p><img src="https://XeroExecute.github.io/sequeldump2.png" alt="sequeldump2"></p>
 <h2 id="pwn">PWN</h2>
 <h3 id="flag-vault">Flag Vault</h3>
 <p><strong>Challenge Description:</strong><br>
@@ -733,7 +762,7 @@ We managed to gain access to one of the Phantom&rsquo;s servers and recover a bi
 <li>Functions named fun_readflag_* have a subsequent call to the read_flag function.</li>
 <li>Functions that have not been renamed (<code>func_*</code>) always call the <code>magic_fail</code>, representing failed paths, and are irrelevant for retrieving the flag.</li>
 </ul>
-<p><img src="/computemagic.png" alt="computemagic"></p>
+<p><img src="https://XeroExecute.github.io/computemagic.png" alt="computemagic"></p>
 <p>The relevant <code>fun_readflag_*</code> functions are as follows:</p>
 <ul>
 <li><code>fun_readflag_1</code> (&lsquo;H&rsquo;), <code>fun_readflag_3</code> (&lsquo;L&rsquo;), <code>fun_readflag_4</code> (&lsquo;P&rsquo; or &lsquo;Q&rsquo;) call <code>check_other</code> and only invoke <code>read_flag</code> if it returns 1.</li>

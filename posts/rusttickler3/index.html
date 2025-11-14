@@ -9,7 +9,7 @@ Rust Tickler 3 | XeroExecute Blog
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="">
-<link rel="stylesheet" href="/css/syntax.css">
+<link rel="stylesheet" href="https://XeroExecute.github.io/css/syntax.css">
 
 <meta name="generator" content="Hugo 0.148.2">
 
@@ -19,11 +19,38 @@ Rust Tickler 3 | XeroExecute Blog
 
 
 
-<link href="/css/style.min.0a8bc3dafec135b0e6d7ef7cf60a4d3d04951624dd8ea930e6b7ec4a14d60bcc.css" rel="stylesheet">
+<link href="https://XeroExecute.github.io/css/style.min.0a8bc3dafec135b0e6d7ef7cf60a4d3d04951624dd8ea930e6b7ec4a14d60bcc.css" rel="stylesheet">
 
 
 <meta name="google-site-verification" content="KMv8VXzcE-0mbx2rKXSIZjgzCIVn7tYJOy74vEb3Vo8" />
 
+
+<meta name="description" content="CTF writeups, reverse engineering, malware analysis, and cybersecurity challenges">
+<meta name="keywords" content="CTF, cybersecurity, reverse engineering, malware analysis, writeups, hacking">
+<meta name="author" content="XeroExecute Blog">
+
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://XeroExecute.github.io/posts/rusttickler3/">
+<meta property="og:title" content="Rust Tickler 3">
+<meta property="og:description" content="CTF writeups, reverse engineering, malware analysis, and cybersecurity challenges">
+<meta property="og:site_name" content="XeroExecute Blog">
+
+<meta property="article:published_time" content="2025-11-03T00:00:00Z">
+<meta property="article:author" content="XeroExecute Blog">
+
+<meta property="article:tag" content="re">
+
+<meta property="article:tag" content="ctf">
+
+<meta property="article:tag" content="rust">
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@XeroExecute">
+<meta name="twitter:creator" content="@XeroExecute">
+<meta name="twitter:title" content="Rust Tickler 3">
+<meta name="twitter:description" content="CTF writeups, reverse engineering, malware analysis, and cybersecurity challenges">
 
 
 </head>
@@ -35,7 +62,7 @@ Rust Tickler 3 | XeroExecute Blog
     <div class="header">
         <div class="headerLogoContainer">
             <a href="https://XeroExecute.github.io/" class="headerLogo">
-                <img src="/logo.png" alt="XeroExecute" class="logoImg">
+                <img src="https://XeroExecute.github.io/logo.png" alt="XeroExecute" class="logoImg">
             </a>
             <a class="terminal" href="https://XeroExecute.github.io/">
                 <span>blog@XeroExecute.github.io ~ $</span>
@@ -69,9 +96,9 @@ Rust Tickler 3 | XeroExecute Blog
                 
 <dt>tags</dt>
 <dd><span></span>
-    <a href="/tags/re/">#Re</a><span></span>
-    <a href="/tags/ctf/">#Ctf</a><span></span>
-    <a href="/tags/rust/">#Rust</a></dd>
+    <a href="https://XeroExecute.github.io/tags/re/">#Re</a><span></span>
+    <a href="https://XeroExecute.github.io/tags/ctf/">#Ctf</a><span></span>
+    <a href="https://XeroExecute.github.io/tags/rust/">#Rust</a></dd>
             
             
             
@@ -274,7 +301,7 @@ Rust Tickler 3 | XeroExecute Blog
 </span></span></code></pre></div><h4 id="stage-2-extraction">Stage 2 extraction</h4>
 <p>Providing the correct input string prints the success message &ldquo;Thank you, Bingus! But our princess is in another castle!&rdquo; however there is no additional hint on how go get the flag. To understand the binary&rsquo;s behavior after successful validation, Process Monitor (Procmon) from Sysinternals Suite is used to observe file system and registry activity during execution.</p>
 <p>Running the binary under Procmon with the correct input reveals a suspicious entry:</p>
-<p><img src="/procmon_Exodus.png" alt="Procmon showing Exodus directory check"></p>
+<p><img src="https://XeroExecute.github.io/procmon_Exodus.png" alt="Procmon showing Exodus directory check"></p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Operation: CreateFile
 </span></span><span class="line"><span class="cl">Path: C:\Users\ladmin\AppData\Roaming\Exodus
 </span></span><span class="line"><span class="cl">Result: NAME NOT FOUND
@@ -282,7 +309,7 @@ Rust Tickler 3 | XeroExecute Blog
 </span></span></code></pre></div><p>In Windows, when <code>CreateFile</code> is called with <code>Desired Access: Read Attributes, Synchronize</code> on a path without a file extension, this indicates a directory existence check rather than an attempt to open a file. The <code>NAME NOT FOUND</code> result means the program is checking for the <code>Exodus</code> directory, which does not exist.</p>
 <p>This directory can be created manually in the expected APPDATA location.
 Running the binary again with the correct input now produces different behavior. Procmon shows successful file operations, and examining the Exodus directory reveals that a new file has been created:</p>
-<p><img src="/Second_Stage_exe.png" alt="Stage 2 binary created in Exodus folder"></p>
+<p><img src="https://XeroExecute.github.io/Second_Stage_exe.png" alt="Stage 2 binary created in Exodus folder"></p>
 <p>The file <code>rust-tickler-3-stage-2.exe</code> appears in the directory. Based on the dynamic analysis and the appearance of the second stage, it can be deduced that the second-stage binary is embedded in encrypted form within the first stage. After successful input validation and directory verification, the program decrypts this embedded data and writes the resulting executable to disk. The second stage binary does not execute automatically and must be run manually to continue the challenge.</p>
 <hr>
 <h3 id="stage-2-rust-tickler-3-stage-2exe">Stage 2: rust-tickler-3-stage-2.exe</h3>

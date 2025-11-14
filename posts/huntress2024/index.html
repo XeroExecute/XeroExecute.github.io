@@ -9,7 +9,7 @@ Huntress 2024 | XeroExecute Blog
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="">
-<link rel="stylesheet" href="/css/syntax.css">
+<link rel="stylesheet" href="https://XeroExecute.github.io/css/syntax.css">
 
 <meta name="generator" content="Hugo 0.148.2">
 
@@ -19,11 +19,40 @@ Huntress 2024 | XeroExecute Blog
 
 
 
-<link href="/css/style.min.0a8bc3dafec135b0e6d7ef7cf60a4d3d04951624dd8ea930e6b7ec4a14d60bcc.css" rel="stylesheet">
+<link href="https://XeroExecute.github.io/css/style.min.0a8bc3dafec135b0e6d7ef7cf60a4d3d04951624dd8ea930e6b7ec4a14d60bcc.css" rel="stylesheet">
 
 
 <meta name="google-site-verification" content="KMv8VXzcE-0mbx2rKXSIZjgzCIVn7tYJOy74vEb3Vo8" />
 
+
+<meta name="description" content="CTF writeups, reverse engineering, malware analysis, and cybersecurity challenges">
+<meta name="keywords" content="CTF, cybersecurity, reverse engineering, malware analysis, writeups, hacking">
+<meta name="author" content="XeroExecute Blog">
+
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://XeroExecute.github.io/posts/huntress2024/">
+<meta property="og:title" content="Huntress 2024">
+<meta property="og:description" content="CTF writeups, reverse engineering, malware analysis, and cybersecurity challenges">
+<meta property="og:site_name" content="XeroExecute Blog">
+
+<meta property="article:published_time" content="2024-10-31T00:00:00Z">
+<meta property="article:author" content="XeroExecute Blog">
+
+<meta property="article:tag" content="Web">
+
+<meta property="article:tag" content="re">
+
+<meta property="article:tag" content="ctf">
+
+<meta property="article:tag" content="malware">
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@XeroExecute">
+<meta name="twitter:creator" content="@XeroExecute">
+<meta name="twitter:title" content="Huntress 2024">
+<meta name="twitter:description" content="CTF writeups, reverse engineering, malware analysis, and cybersecurity challenges">
 
 
 </head>
@@ -35,7 +64,7 @@ Huntress 2024 | XeroExecute Blog
     <div class="header">
         <div class="headerLogoContainer">
             <a href="https://XeroExecute.github.io/" class="headerLogo">
-                <img src="/logo.png" alt="XeroExecute" class="logoImg">
+                <img src="https://XeroExecute.github.io/logo.png" alt="XeroExecute" class="logoImg">
             </a>
             <a class="terminal" href="https://XeroExecute.github.io/">
                 <span>blog@XeroExecute.github.io ~ $</span>
@@ -69,10 +98,10 @@ Huntress 2024 | XeroExecute Blog
                 
 <dt>tags</dt>
 <dd><span></span>
-    <a href="/tags/web/">#Web</a><span></span>
-    <a href="/tags/re/">#Re</a><span></span>
-    <a href="/tags/ctf/">#Ctf</a><span></span>
-    <a href="/tags/malware/">#Malware</a></dd>
+    <a href="https://XeroExecute.github.io/tags/web/">#Web</a><span></span>
+    <a href="https://XeroExecute.github.io/tags/re/">#Re</a><span></span>
+    <a href="https://XeroExecute.github.io/tags/ctf/">#Ctf</a><span></span>
+    <a href="https://XeroExecute.github.io/tags/malware/">#Malware</a></dd>
             
             
             
@@ -133,7 +162,7 @@ Huntress 2024 | XeroExecute Blog
 <p>Intercepting the webapp&rsquo;s request traffic with Burp, we observe the use of a websocket. The intercepted traffic consists mainly of incomprehensible text and a few integers, likely encrypted. Modifying these integers and resending the request results in the disconnection of our websocket session.</p>
 <p>As there appears to be no direct means of manipulating an item&rsquo;s price, our next strategy involves attempting to buy a negative quantity of apples - and voila!<br>
 This little trick adds the cost of these negative apples to our balance.<br>
-<img src="/Whamazon.png" alt="Whamazon"></p>
+<img src="https://XeroExecute.github.io/Whamazon.png" alt="Whamazon"></p>
 <p>After managing to afford and purchase the flag, we are led into a game of rock-paper-scissors against a Whamazon bot. Interestingly, the bot seems to consistently choose the same move, allowing us to finally claim our flag listed in the inventory.</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">We</span> <span class="n">got</span> <span class="nb">all</span> <span class="n">the</span> <span class="n">deets</span> <span class="n">on</span> <span class="n">what</span><span class="s1">&#39;s what in your inventory:</span>
 </span></span><span class="line"><span class="cl"> <span class="o">------------------------</span> 
@@ -143,7 +172,7 @@ This little trick adds the cost of these negative apples to our balance.<br>
 <h3 id="alternative-solution">Alternative Solution</h3>
 <p>Interestingly, an alternate solution exists for obtaining the flag. We can cause a crash in the Python application that&rsquo;s behind the scenes of the webshop, which would subsequently allow us to gain an interactive shell within the associated Docker container.</p>
 <p>This can be achieved by repeatedly interrupting the program using the <code>CTRL-C</code> command and refreshing the page every time the connection is severed. After several attempts, a stacktrace becomes visible, and normal OS commands can be run inside the shell.<br>
-<img src="/Whamazon_Shell.png" alt="Whamazon_Shell"></p>
+<img src="https://XeroExecute.github.io/Whamazon_Shell.png" alt="Whamazon_Shell"></p>
 <hr>
 <h1 id="keyboard-junkie">Keyboard Junkie</h1>
 <p><strong>Challenge</strong> Author: @JohnHammond<br>
@@ -266,7 +295,7 @@ This can be done using the following command:</p>
 <h2 id="strange-calc-solution">Strange Calc Solution</h2>
 <p>Our team had two main ways to beat this task. I&rsquo;ll start with the easy one: using a sandbox. Obviously it was a private sandbox instance so the challenge wouldn&rsquo;t be leaked.</p>
 <p>When looking at the process tree, we saw some unusual net commands happening. Normal calculators shouldn&rsquo;t do this. All this seemed to connect to a file named &ldquo;WmZ93kfDVH.jse&rdquo;. We don&rsquo;t know where this file came from, but it looks like the calculator process (calc.exe) is executing it.</p>
-<p><img src="/Strange_Calc_Process.png" alt="Process tree"></p>
+<p><img src="https://XeroExecute.github.io/Strange_Calc_Process.png" alt="Process tree"></p>
 <p>Lucky for us the sandbox has a feature to download files that were created during execution. So we can directly download the .jse file without having to extract it ourself from the calc.exe.<br>
 Looking at the content of that file its just some binary garbage.</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1">#@~^cQMAAA==W!x^DkKxPm`(b	7l.P1&#39;EEBN&#39;( /aVkDcE-	J*iWW.c7l.Px!p+@![cV+ULDtI+3Q*	-mD,0&#39;9$DRM+2VmmncJ7-kQu&#39;/_f&amp;L~EB*ir0cWckUNar6`E8okUE*&#39;x&#39;Zk-0 bx9+6}0vENE#{&#39;xT-u0{x&#39;rJ#1GUYbx!+I\C.,ox`6 m4l./KN+)Ov!bO2+*[2i6WDv\m.P4&#39;qi4@!W ^+xTOtpt_{*b	b0vtQ&amp;@*x6Rs+	LY4#8.l3I-mD~k{c6R^4lMZW9+zO`4#R&amp;y#&#39;2~L{c0cmtm./W9+zYctQq*Of *&#39;v2~Vxv0R^4mD/W9nzYc4_y#O2 *&#39;v2~s&#39;v0 ^4lD;GNbYv4Q&amp;*O2 b[fpmQ&#39;UODbxL 6DWh/4l.ZK[`cb@!@! #-`N@*@*W#bib0c43 @!6 VxoD4RF*m3&#39;jY.r	o 0MG:;tC.;WNncv`%[8X*@!@!W#-`3@*@*yb#pkW`4_f@!6RVUoDtO8b^_{?DDrxL 6DG:;4lMZ</span>
