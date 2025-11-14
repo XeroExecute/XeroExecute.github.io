@@ -3,7 +3,7 @@
 
 <head>
     <title>
-Rust Tickler 3 | XeroExecute Blog
+Rust Tickler 3 - Huntress CTF 2025 Reverse Engineering Writeup | XeroExecute Blog
 </title>
 
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
@@ -25,13 +25,53 @@ Rust Tickler 3 | XeroExecute Blog
 <meta name="google-site-verification" content="KMv8VXzcE-0mbx2rKXSIZjgzCIVn7tYJOy74vEb3Vo8" />
 
 
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "\"Rust Tickler 3 - Huntress CTF 2025 Reverse Engineering Writeup\"",
+  "description": "\"Complete walkthrough of Rust Tickler 3, a multi-stage Rust reverse engineering challenge from Huntress CTF 2025. Covers dynamic analysis, memory extraction, custom PRNG XOR cipher, and AES-256-CBC decryption techniques.\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"XeroExecute Blog\"",
+    "url": "https://github.com/XeroExecute"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"XeroExecute Blog\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https:\/\/XeroExecute.github.io\/logo.png"
+    }
+  },
+  "datePublished": "\"2025-11-03T00:00:00Z\"",
+  
+  "dateModified": "\"2025-11-03T00:00:00Z\"",
+  
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://XeroExecute.github.io/posts/rusttickler3/\""
+  },
+  
+  "keywords": "\"re, ctf, rust, huntress, cryptography\"",
+  
+  "articleSection": "\"CTF Writeups\"",
+  "wordCount":  2870 ,
+  "inLanguage": "en-US",
+  "url": "\"https://XeroExecute.github.io/posts/rusttickler3/\""
+}
+</script>
+
+
+
 <meta name="description" content="CTF writeups, reverse engineering, malware analysis, and cybersecurity challenges">
-<meta name="keywords" content="CTF, cybersecurity, reverse engineering, malware analysis, writeups, hacking">
+<meta name="keywords" content="huntress ctf 2025, rust reverse engineering, rust tickler 3 writeup, IDA, AES-256-CBC, PRNG XOR cipher">
 <meta name="author" content="XeroExecute Blog">
 
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://XeroExecute.github.io/posts/rusttickler3/">
-<meta property="og:title" content="Rust Tickler 3">
+<meta property="og:title" content="Rust Tickler 3 - Huntress CTF 2025 Reverse Engineering Writeup">
 <meta property="og:description" content="CTF writeups, reverse engineering, malware analysis, and cybersecurity challenges">
 <meta property="og:site_name" content="XeroExecute Blog">
 
@@ -44,12 +84,16 @@ Rust Tickler 3 | XeroExecute Blog
 
 <meta property="article:tag" content="rust">
 
+<meta property="article:tag" content="huntress">
+
+<meta property="article:tag" content="cryptography">
+
 
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@XeroExecute">
 <meta name="twitter:creator" content="@XeroExecute">
-<meta name="twitter:title" content="Rust Tickler 3">
+<meta name="twitter:title" content="Rust Tickler 3 - Huntress CTF 2025 Reverse Engineering Writeup">
 <meta name="twitter:description" content="CTF writeups, reverse engineering, malware analysis, and cybersecurity challenges">
 
 
@@ -87,7 +131,7 @@ Rust Tickler 3 | XeroExecute Blog
             <main class="main">
                 
 <div class="postWrapper">
-    <h1>Rust Tickler 3</h1>
+    <h1>Rust Tickler 3 - Huntress CTF 2025 Reverse Engineering Writeup</h1>
     
     
     <section class="postMetadata">
@@ -98,9 +142,17 @@ Rust Tickler 3 | XeroExecute Blog
 <dd><span></span>
     <a href="https://XeroExecute.github.io/tags/re/">#Re</a><span></span>
     <a href="https://XeroExecute.github.io/tags/ctf/">#Ctf</a><span></span>
-    <a href="https://XeroExecute.github.io/tags/rust/">#Rust</a></dd>
+    <a href="https://XeroExecute.github.io/tags/rust/">#Rust</a><span></span>
+    <a href="https://XeroExecute.github.io/tags/huntress/">#Huntress</a><span></span>
+    <a href="https://XeroExecute.github.io/tags/cryptography/">#Cryptography</a></dd>
             
             
+            
+                
+<dt>categories</dt>
+<dd><span></span>
+    <a href="https://XeroExecute.github.io/categories/ctf-writeups/">CTF Writeups</a><span></span>
+    <a href="https://XeroExecute.github.io/categories/reverse-engineering/">Reverse Engineering</a></dd>
             
             
                 <dt>published</dt>

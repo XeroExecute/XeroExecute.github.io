@@ -1,21 +1,28 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Rust on XeroExecute Blog</title>
-    <link>https://XeroExecute.github.io/tags/rust/</link>
-    <description>Recent content in Rust on XeroExecute Blog</description>
+    <title>CTF Writeups on XeroExecute Blog</title>
+    <link>https://XeroExecute.github.io/categories/ctf-writeups/</link>
+    <description>Recent content in CTF Writeups on XeroExecute Blog</description>
     <generator>Hugo</generator>
     <language>en-us</language>
     <managingEditor>sir_xxxx@protonmail.com (XeroExecute Blog)</managingEditor>
     <webMaster>sir_xxxx@protonmail.com (XeroExecute Blog)</webMaster>
     <lastBuildDate>Mon, 03 Nov 2025 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://XeroExecute.github.io/tags/rust/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://XeroExecute.github.io/categories/ctf-writeups/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Rust Tickler 3 - Huntress CTF 2025 Reverse Engineering Writeup</title>
       <link>https://XeroExecute.github.io/posts/rusttickler3/</link>
       <pubDate>Mon, 03 Nov 2025 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
       <guid>https://XeroExecute.github.io/posts/rusttickler3/</guid>
       <description>Complete walkthrough of Rust Tickler 3, a multi-stage Rust reverse engineering challenge from Huntress CTF 2025. Covers dynamic analysis, memory extraction, custom PRNG XOR cipher, and AES-256-CBC decryption techniques.</description>
+    </item>
+    <item>
+      <title>No Limits - Huntress CTF 2025 PWN Challenge Writeup</title>
+      <link>https://XeroExecute.github.io/posts/nolimits/</link>
+      <pubDate>Sat, 01 Nov 2025 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
+      <guid>https://XeroExecute.github.io/posts/nolimits/</guid>
+      <description>Complete writeup for &amp;ldquo;No Limits&amp;rdquo; PWN challenge from Huntress CTF 2025. Exploit a parent-child process architecture to bypass seccomp restrictions using /proc/pid/mem and GOT hijacking techniques.</description>
     </item>
   </channel>
 </rss>

@@ -11,18 +11,18 @@
     <lastBuildDate>Mon, 03 Nov 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://XeroExecute.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Rust Tickler 3</title>
+      <title>Rust Tickler 3 - Huntress CTF 2025 Reverse Engineering Writeup</title>
       <link>https://XeroExecute.github.io/posts/rusttickler3/</link>
       <pubDate>Mon, 03 Nov 2025 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
       <guid>https://XeroExecute.github.io/posts/rusttickler3/</guid>
-      <description>Multi-stage Rust reverse engineering challenge containing different input validation cryptographic algorithms. Solved through dynamic analysis and memory extraction techniques to recover embedded secrets from custom PRNG XOR cipher and AES-256-CBC implementations.</description>
+      <description>Complete walkthrough of Rust Tickler 3, a multi-stage Rust reverse engineering challenge from Huntress CTF 2025. Covers dynamic analysis, memory extraction, custom PRNG XOR cipher, and AES-256-CBC decryption techniques.</description>
     </item>
     <item>
-      <title>No Limits Huntress 2025</title>
+      <title>No Limits - Huntress CTF 2025 PWN Challenge Writeup</title>
       <link>https://XeroExecute.github.io/posts/nolimits/</link>
       <pubDate>Sat, 01 Nov 2025 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
       <guid>https://XeroExecute.github.io/posts/nolimits/</guid>
-      <description>Exploiting a parent-child process architecture to bypass seccomp restrictions using /proc/pid/mem and GOT hijacking to read the flag.</description>
+      <description>Complete writeup for &amp;ldquo;No Limits&amp;rdquo; PWN challenge from Huntress CTF 2025. Exploit a parent-child process architecture to bypass seccomp restrictions using /proc/pid/mem and GOT hijacking techniques.</description>
     </item>
     <item>
       <title>TryHackMe: Industrial Intrusion - auth (9005)</title>
