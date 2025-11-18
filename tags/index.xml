@@ -185,5 +185,26 @@
       <guid>https://XeroExecute.github.io/tags/xss/</guid>
       <description></description>
     </item>
+    <item>
+      <title>Malware-Analysis</title>
+      <link>https://XeroExecute.github.io/tags/malware-analysis/</link>
+      <pubDate>Wed, 03 Apr 2024 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
+      <guid>https://XeroExecute.github.io/tags/malware-analysis/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Mirai</title>
+      <link>https://XeroExecute.github.io/tags/mirai/</link>
+      <pubDate>Wed, 03 Apr 2024 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
+      <guid>https://XeroExecute.github.io/tags/mirai/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Tools</title>
+      <link>https://XeroExecute.github.io/tags/tools/</link>
+      <pubDate>Wed, 03 Apr 2024 00:00:00 +0000</pubDate><author>sir_xxxx@protonmail.com (XeroExecute Blog)</author>
+      <guid>https://XeroExecute.github.io/tags/tools/</guid>
+      <description></description>
+    </item>
   </channel>
 </rss>
