@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+    <title>
+Automated String Decryption for Mirai Malware Analysis | XeroExecute Blog
+</title>
+
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Ghidra script that automatically identifies and decrypts obfuscated strings in Mirai botnet samples. Supports Shift XOR, RC4, and Bruteforce XOR across multiple processor architectures.">
+<link rel="stylesheet" href="https://XeroExecute.github.io/css/syntax.css">
+
+<meta name="generator" content="Hugo 0.148.2">
+
+
+<link rel="canonical" href="https://XeroExecute.github.io/mirai-string-decryption/" >
+
+
+
+
+<link href="https://XeroExecute.github.io/css/style.min.8cdf45129e698beff52182f588bbbc134ae5082c1fa67cd3626a506cdcd5c818.css" rel="stylesheet">
+
+<meta name="google-site-verification" content="KMv8VXzcE-0mbx2rKXSIZjgzCIVn7tYJOy74vEb3Vo8" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "\"Automated String Decryption for Mirai Malware Analysis\"",
+  "description": "\"Ghidra script that automatically identifies and decrypts obfuscated strings in Mirai botnet samples. Supports Shift XOR, RC4, and Bruteforce XOR across multiple processor architectures.\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"XeroExecute Blog\"",
+    "url": "https://github.com/XeroExecute"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"XeroExecute Blog\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https:\/\/XeroExecute.github.io\/logo.png"
+    }
+  },
+  "datePublished": "\"2024-04-03T00:00:00Z\"",
+  
+  "dateModified": "\"2024-04-03T00:00:00Z\"",
+  
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://XeroExecute.github.io/mirai-string-decryption/\""
+  },
+  
+  "keywords": "\"tools, malware-analysis, reverse-engineering, ghidra, mirai\"",
+  
+  "articleSection": "CTF Writeups",
+  "wordCount":  434 ,
+  "inLanguage": "en-US",
+  "url": "\"https://XeroExecute.github.io/mirai-string-decryption/\""
+}
+</script>
+
+<script data-goatcounter="https://xeroexecute.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<meta name="keywords" content="Mirai, malware analysis, string decryption, Ghidra, reverse engineering, XOR, RC4, cybersecurity, botnet, automated analysis">
+<meta name="author" content="XeroExecute Blog">
+
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://XeroExecute.github.io/mirai-string-decryption/">
+<meta property="og:title" content="Automated String Decryption for Mirai Malware Analysis">
+<meta property="og:description" content="Ghidra script that automatically identifies and decrypts obfuscated strings in Mirai botnet samples. Supports Shift XOR, RC4, and Bruteforce XOR across multiple processor architectures.">
+<meta property="og:site_name" content="XeroExecute Blog">
+
+<meta property="article:published_time" content="2024-04-03T00:00:00Z">
+<meta property="article:author" content="XeroExecute Blog">
+
+<meta property="article:tag" content="tools">
+
+<meta property="article:tag" content="malware-analysis">
+
+<meta property="article:tag" content="reverse-engineering">
+
+<meta property="article:tag" content="ghidra">
+
+<meta property="article:tag" content="mirai">
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@XeroExecute">
+<meta name="twitter:creator" content="@XeroExecute">
+<meta name="twitter:title" content="Automated String Decryption for Mirai Malware Analysis">
+<meta name="twitter:description" content="Ghidra script that automatically identifies and decrypts obfuscated strings in Mirai botnet samples. Supports Shift XOR, RC4, and Bruteforce XOR across multiple processor architectures.">
+
+
+</head>
+
+<body>
+
+    <div class="flexWrapper">
+        <header class="headerWrapper">
+    <div class="header">
+        <div class="headerLogoContainer">
+            <a href="https://XeroExecute.github.io/" class="headerLogo">
+                <img src="https://XeroExecute.github.io/logo.png" alt="XeroExecute" class="logoImg">
+            </a>
+            <a class="terminal" href="https://XeroExecute.github.io/">
+                <span>blog@XeroExecute.github.io ~ $</span>
+            </a>
+        </div>
+        <input class="side-menu" type="checkbox" id="side-menu">
+        <label class="hamb" for="side-menu"><span class="hamb-line"></span></label>
+        <nav class="headerLinks">
+            <ul>
+                
+                <li>
+                    <a href="https://XeroExecute.github.io/posts" title="" >
+                        ~/posts</a>
+                </li>
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+        <div class="content">
+            <main class="main">
+                
+<div class="postWrapper">
+    <h1>Automated String Decryption for Mirai Malware Analysis</h1>
+    
+    	<p>Ghidra script that automatically identifies and decrypts obfuscated strings in Mirai botnet samples. Supports Shift XOR, RC4, and Bruteforce XOR across multiple processor architectures.</p>
+    
+    
+    <section class="postMetadata">
+        <dl>
+            
+                
+<dt>tags</dt>
+<dd><span></span>
+    <a href="https://XeroExecute.github.io/tags/tools/">#Tools</a><span></span>
+    <a href="https://XeroExecute.github.io/tags/malware-analysis/">#Malware-Analysis</a><span></span>
+    <a href="https://XeroExecute.github.io/tags/reverse-engineering/">#Reverse-Engineering</a><span></span>
+    <a href="https://XeroExecute.github.io/tags/ghidra/">#Ghidra</a><span></span>
+    <a href="https://XeroExecute.github.io/tags/mirai/">#Mirai</a></dd>
+            
+            
+            
+            
+                <dt>published</dt>
+                
+                <dd><time datetime="2024-04-03">April 3, 2024</time></dd>
+            
+            
+                <dt>reading time</dt>
+                <dd>3 minutes</dd>
+            
+        </dl>
+    </section>
+    
+    
+    <aside class="toc-container">
+        <h2>Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#why-use-this">Why Use This?</a></li>
+    <li><a href="#supported-decryption-methods">Supported Decryption Methods</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#quick-start">Quick Start</a></li>
+    <li><a href="#detailed-usage">Detailed Usage</a>
+      <ul>
+        <li><a href="#ghidra-ui">Ghidra UI</a></li>
+        <li><a href="#ghidra-headless">Ghidra Headless</a></li>
+      </ul>
+    </li>
+    <li><a href="#use-cases">Use Cases</a></li>
+    <li><a href="#contributing">Contributing</a></li>
+  </ul>
+</nav>
+    </aside>
+    
+    <div>
+        <p>A Ghidra script that automates the tedious process of identifying and decrypting obfuscated strings in Mirai malware samples. Built to work across multiple processor architectures.</p>
+<h2 id="why-use-this">Why Use This?</h2>
+<p>Mirai malware variants obfuscate their strings using various encryption methods to evade static analysis. Manually identifying and decrypting these strings is time-consuming and error-prone. This script automates the entire process, allowing you to focus on analyzing the malware&rsquo;s behavior rather than fighting with encryption routines.</p>
+<h2 id="supported-decryption-methods">Supported Decryption Methods</h2>
+<p>The script automatically detects and handles three encryption types commonly found in Mirai samples:</p>
+<ul>
+<li><strong>Shift XOR</strong> - Xor string obfuscation used in some Mirai variants</li>
+<li><strong>RC4</strong> - Xor string encryption for Mirai strings</li>
+<li><strong>Bruteforce XOR</strong> - Specialized method for decrypting embedded credentials</li>
+</ul>
+<p>The script attempts to automatically load and decrypt strings where possible, though some edge cases may require manual intervention or script customization.</p>
+<h2 id="features">Features</h2>
+<ul>
+<li><strong>Fully Automated</strong>: Identifies decryption routines and processes strings without manual configuration</li>
+<li><strong>Multi-Architecture Support</strong>: Works across ARM, MIPS, x86, and other architectures commonly targeted by Mirai</li>
+<li><strong>Three Decryption Algorithms</strong>: Handles Shift XOR, RC4, and Bruteforce XOR encryption schemes</li>
+<li><strong>Ghidra Integration</strong>: Seamlessly integrates into your existing Ghidra workflow via Script Manager</li>
+<li><strong>Headless Mode</strong>: Batch process multiple samples via command line for automated analysis pipelines</li>
+</ul>
+<h2 id="quick-start">Quick Start</h2>
+<p><strong>Clone the repository</strong>:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git clone https://github.com/xeroexecute/mirai-string-decryption.git
+</span></span></code></pre></div><p><strong>Ghidra GUI</strong>: Script Manager → Manage Script Directories → Add repo folder → Refresh → Run from <code>Analysis/Mirai</code></p>
+<p><strong>Headless Mode</strong>: Perfect for automating analysis of multiple samples in a Ghidra project</p>
+<h2 id="detailed-usage">Detailed Usage</h2>
+<h3 id="ghidra-ui">Ghidra UI</h3>
+<ol>
+<li>Open Ghidra and navigate to the <strong>Script Manager</strong></li>
+<li>Add the directory of the downloaded Git repository to the Script directories:
+<ul>
+<li>Click the <strong>Manage Script Directories</strong> button</li>
+<li>Add the directory of the cloned repository</li>
+</ul>
+</li>
+<li>Refresh the script list:
+<ul>
+<li>Click the <strong>Refresh Script List</strong> button</li>
+</ul>
+</li>
+<li>The script should now be visible under <code>Analysis/Mirai/</code> and can be executed for the currently open binary</li>
+</ol>
+<h3 id="ghidra-headless">Ghidra Headless</h3>
+<p>For batch processing multiple samples or integrating into automated analysis pipelines:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">analyzeHeadless <span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/&lt;ghidra-project&gt; &lt;ghidra-mirai-project&gt; <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  -scriptPath <span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  -postScript miraiDecryptionRoutines.java <span class="s2">&#34;verbose&#34;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  -process <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  -scriptlog mirai.log
+</span></span></code></pre></div><p>The <code>verbose</code> parameter enables detailed logging of all detected decryption routines and decrypted strings. Results are saved to <code>mirai.log</code> for further analysis.</p>
+<h2 id="use-cases">Use Cases</h2>
+<ul>
+<li><strong>Malware Analysis</strong>: Quickly extract C2 server addresses, credentials, and other IOCs from Mirai samples</li>
+<li><strong>Threat Hunting</strong>: Batch process suspected Mirai binaries collected from honeypots</li>
+<li><strong>Research</strong>: Analyze evolution of string obfuscation techniques across Mirai variants</li>
+</ul>
+<h2 id="contributing">Contributing</h2>
+<p>The script works well for common Mirai variants, but edge cases exist where string loading may fail. Contributions to improve string extraction logic or add support for additional decryption methods are welcome.</p>
+<p><strong>GitHub Repository</strong>: <a href="https://github.com/xeroexecute/mirai-string-decryption">xeroexecute/mirai-string-decryption</a></p>
+<p>For questions or suggestions, contact <a href="mailto:sir_xxxx@protonmail.com">@Sir_X</a></p>
+
+    </div>
+</div>
+
+            </main>
+        </div>
+
+
+        <footer class="footer">
+    
+        <span>
+            © 2025 XeroExecute Blog, Built with
+            <a href="https://gohugo.io" class="footerLink">Hugo</a> and
+            <a href="https://github.com/LordMathis/hugo-theme-nightfall" class="footerLink">Nightfall</a> theme
+        </span>
+    
+</footer>
+    </div>
+
+</body>
+
+</html>
