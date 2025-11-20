@@ -12,24 +12,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Extract URLs from sitemap
-        id: urls
-        run: |
-          # Download sitemap
-          curl -s https://xeroexecute.github.io/sitemap.xml > sitemap.xml
-
-          # Extract all URLs from sitemap (excluding tag/category pages)
-          URLS=$(grep -oP '(?<=<loc>)[^<]+(?=</loc>)' sitemap.xml | grep -E '/posts/|/mirai-|^https://xeroexecute.github.io/$' | jq -R . | jq -s .)
-
-          echo "urls=$URLS" >> $GITHUB_OUTPUT
-
       - name: Submit to IndexNow
         run: |
+          # Download sitemap and extract URLs
+          URLS=$(curl -s https://xeroexecute.github.io/sitemap.xml | \
+            grep -oP '(?<=<loc>)[^<]+(?=</loc>)' | \
+            grep -E '/posts/|^https://xeroexecute.github.io/$' | \
+            jq -R . | jq -s -c .)
+
+          # Submit to IndexNow
           curl -X POST "https://api.indexnow.org/indexnow" \
             -H "Content-Type: application/json" \
-            -d '{
-              "host": "xeroexecute.github.io",
-              "key": "069da8f997925339cf0623f3f9ddac028a064d79abd239184af4e652c9d976f3f53bac7f194a19900e91b82d06b862fbf0ba2b3550641a19270122bdd33f0d76",
-              "keyLocation": "https://xeroexecute.github.io/069da8f997925339cf0623f3f9ddac028a064d79abd239184af4e652c9d976f3f53bac7f194a19900e91b82d06b862fbf0ba2b3550641a19270122bdd33f0d76.txt",
-              "urlList": ${{ steps.urls.outputs.urls }}
-            }'
+            -d "{
+              \"host\": \"xeroexecute.github.io\",
+              \"key\": \"069da8f997925339cf0623f3f9ddac028a064d79abd239184af4e652c9d976f3f53bac7f194a19900e91b82d06b862fbf0ba2b3550641a19270122bdd33f0d76\",
+              \"keyLocation\": \"https://xeroexecute.github.io/069da8f997925339cf0623f3f9ddac028a064d79abd239184af4e652c9d976f3f53bac7f194a19900e91b82d06b862fbf0ba2b3550641a19270122bdd33f0d76.txt\",
+              \"urlList\": $URLS
+            }"
